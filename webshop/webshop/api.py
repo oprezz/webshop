@@ -12,6 +12,12 @@ from webshop.webshop.product_data_engine.query import ProductQuery
 from webshop.webshop.doctype.override_doctype.item_group import get_child_groups_for_website
 
 
+def filter_items_with_price(items):
+	"""
+	Filter out items which do not have price
+	"""
+	return [item for item in items if "price_list_rate" in item]
+
 @frappe.whitelist(allow_guest=True)
 def get_product_filter_data(query_args=None):
 	"""
@@ -74,6 +80,8 @@ def get_product_filter_data(query_args=None):
 	if discounts:
 		filter_engine = ProductFiltersBuilder()
 		filters["discount_filters"] = filter_engine.get_discount_filters(discounts)
+
+	result["items"] = filter_items_with_price(result["items"])
 
 	return {
 		"items": result["items"] or [],
