@@ -136,7 +136,7 @@ webshop.ProductView =  class {
 
 		field_filters = field_filters ? JSON.parse(field_filters) : {};
 		attribute_filters = attribute_filters ? JSON.parse(attribute_filters) : {};
-
+		console.log("field filters:", field_filters);
 		return {
 			field_filters: field_filters,
 			attribute_filters: attribute_filters,
@@ -228,7 +228,7 @@ webshop.ProductView =  class {
 	bind_view_toggler_actions() {
 		$("#list").click(function() {
 			let $btn = $(this);
-			$btn.removeClass('btn-primary');
+			$btn.removeClass('btn->mary');
 			$btn.addClass('btn-primary');
 			$(".btn-grid-view").removeClass('btn-primary');
 

@@ -97,7 +97,16 @@
 				<div class="mb-3 frappe-card p-5 payment-summary">
 					{% include "templates/includes/cart/cart_payment_summary.html" %}
 				</div>
-
+				
+				<div class="mb-3 frappe-card p-5">
+					<div class="clearfix">
+						<label class="control-label" style="padding-right: 0px;">Expected Delivery Date</label>
+						<span class="help"></span>
+					</div>
+					<div class="control-input">
+						<input type="date" id="btn_custom_delivery_date" class="form-control hasDatepicker" value="{{ doc.custom_delivery_date }}">
+					</div>
+				</div>
 				{% include "templates/includes/cart/cart_address.html" %}
 			</div>
 		</div>

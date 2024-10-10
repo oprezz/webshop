@@ -128,7 +128,10 @@ def place_order():
 							item_stock.stock_qty, item.item_code
 						)
 					)
-
+     
+	if quotation.custom_delivery_date is not None:
+ 		sales_order.delivery_date = quotation.custom_delivery_date
+   
 	sales_order.flags.ignore_permissions = True
 	sales_order.insert()
 	sales_order.submit()
@@ -138,6 +141,15 @@ def place_order():
 
 	return sales_order.name
 
+@frappe.whitelist()
+def set_delivery_date(delivery_date):
+	quotation = _get_cart_quotation()
+	quotation.flags.ignore_permissions = True
+	quotation.custom_delivery_date = delivery_date
+	print("quotation.custom_delivery_date:" + quotation.custom_delivery_date)
+	quotation.save()
+	return
+    
 
 @frappe.whitelist()
 def request_for_quotation():

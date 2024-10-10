@@ -18,6 +18,14 @@ $.extend(shopping_cart, {
 		shopping_cart.bind_remove_cart_item();
 		shopping_cart.bind_change_notes();
 		shopping_cart.bind_coupon_code();
+		shopping_cart.bind_custom_delivery_date();
+	},
+
+	bind_custom_delivery_date: function() {
+		$("#btn_custom_delivery_date").on("change", function() {
+			var delivery_date = this.value
+			shopping_cart.set_delivery_date(this, delivery_date);
+		})
 	},
 
 	bind_place_order: function() {
@@ -192,6 +200,31 @@ $.extend(shopping_cart, {
 		});
 	},
 
+	set_delivery_date: function(btn, deliv_date) {
+		shopping_cart.freeze();
+
+		return frappe.call({
+			type: "POST",
+			method: "webshop.webshop.shopping_cart.cart.set_delivery_date",
+			btn: btn,
+			args: {delivery_date: deliv_date},
+			callback: function(r) {
+				shopping_cart.unfreeze();
+				if(r.exc) {
+					var msg = "";
+					if(r._server_messages) {
+						msg = JSON.parse(r._server_messages || []).join("<br>");
+					}
+
+					$("#cart-error")
+						.empty()
+						.html(msg || frappe._("Something went wrong!"))
+						.toggle(true);
+				} 
+			}
+		});
+	},
+
 	bind_coupon_code: function() {
 		$(".bt-coupon").on("click", function() {
 			shopping_cart.apply_coupon_code(this);
@@ -213,6 +246,29 @@ $.extend(shopping_cart, {
 				}
 			}
 		});
+	},
+
+	filter_delivery_dates: function()
+	{
+		// Everything except weekend days
+		const validate = dateString => {
+			const day = (new Date(dateString)).getDay();
+			if (day==6 || day==7) {
+			return false;
+			}
+			return true;
+		}
+
+		var today = new Date().toISOString().split('T')[0];
+		var datePicker = $("#btn_custom_delivery_date");
+		$("#btn_custom_delivery_date")[0].min = today
+		console.log("datePicker: ", $("#btn_custom_delivery_date")[0]);
+		$("#btn_custom_delivery_date")[0].onchange = evt => {
+			if (!validate(evt.target.value)) {
+				evt.target.value = '';
+			}
+		}
+		console.log("datePicker2: ", $("#btn_custom_delivery_date")[0]);
 	}
 });
 
@@ -222,6 +278,7 @@ frappe.ready(function() {
 	}
 	shopping_cart.parent = $(".cart-container");
 	shopping_cart.bind_events();
+	shopping_cart.filter_delivery_dates();
 });
 
 function show_terms() {
