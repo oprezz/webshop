@@ -1,4 +1,4 @@
-webshop.ProductView =  class {
+webshop.ProductView = class {
 	/* Options:
 		- View Type
 		- Products Section Wrapper,
@@ -10,7 +10,7 @@ webshop.ProductView =  class {
 		this.make();
 	}
 
-	make(from_filters=false) {
+	make(from_filters = false) {
 		this.products_section.empty();
 		this.prepare_toolbar();
 		this.get_item_filter_data(from_filters);
@@ -36,7 +36,7 @@ webshop.ProductView =  class {
 		}
 	}
 
-	get_item_filter_data(from_filters=false) {
+	get_item_filter_data(from_filters = false) {
 		// Get and render all Product related views
 		let me = this;
 		this.from_filters = from_filters;
@@ -49,7 +49,7 @@ webshop.ProductView =  class {
 			args: {
 				query_args: args
 			},
-			callback: function(result) {
+			callback: function (result) {
 				if (!result || result.exc || !result.message || result.message.exc) {
 					me.render_no_products_section(true);
 				} else {
@@ -91,7 +91,7 @@ webshop.ProductView =  class {
 		});
 	}
 
-	disable_view_toggler(disable=false) {
+	disable_view_toggler(disable = false) {
 		$('#list').prop('disabled', disable);
 		$('#image-view').prop('disabled', disable);
 	}
@@ -126,17 +126,17 @@ webshop.ProductView =  class {
 		let top_margin = view == "list" ? "mt-6" : "mt-minus-1";
 		return this.products_section.append(`
 			<br>
-			<div id="products-${view}-area" class="row products-list ${ top_margin } ${ left_margin }" itemscope itemtype="https://schema.org/Product"></div>
+			<div id="products-${view}-area" class="row products-list ${top_margin} ${left_margin}" itemscope itemtype="https://schema.org/Product"></div>
 		`);
 	}
 
 	get_query_filters() {
 		const filters = frappe.utils.get_query_params();
-		let {field_filters, attribute_filters} = filters;
+		let { field_filters, attribute_filters } = filters;
 
 		field_filters = field_filters ? JSON.parse(field_filters) : {};
 		attribute_filters = attribute_filters ? JSON.parse(attribute_filters) : {};
-		console.log("field filters:", field_filters);
+
 		return {
 			field_filters: field_filters,
 			attribute_filters: attribute_filters,
@@ -164,15 +164,15 @@ webshop.ProductView =  class {
 			let next_disable = (this.product_count > page_length) ? "" : "disabled";
 
 			paging_html += `
-				<button class="btn btn-default btn-prev" data-start="${ start - page_length }"
+				<button class="btn btn-default btn-prev" data-start="${start - page_length}"
 					style="float: left" ${prev_disable}>
-					${ __("Prev") }
+					${__("Prev")}
 				</button>`;
 
 			paging_html += `
-				<button class="btn btn-default btn-next" data-start="${ start + page_length }"
+				<button class="btn btn-default btn-next" data-start="${start + page_length}"
 					${next_disable}>
-					${ __("Next") }
+					${__("Next")}
 				</button>
 			`;
 
@@ -213,10 +213,10 @@ webshop.ProductView =  class {
 			let icon = view === "btn-list-view" ? "list" : "image-view";
 			$(".toggle-container").append(`
 				<div class="form-group mb-0" id="toggle-view">
-					<button id="${ icon }" class="btn ${ view } mr-2">
+					<button id="${icon}" class="btn ${view} mr-2">
 						<span>
 							<svg class="icon icon-md">
-								<use href="#icon-${ icon }"></use>
+								<use href="#icon-${icon}"></use>
 							</svg>
 						</span>
 					</button>
@@ -226,9 +226,9 @@ webshop.ProductView =  class {
 	}
 
 	bind_view_toggler_actions() {
-		$("#list").click(function() {
+		$("#list").click(function () {
 			let $btn = $(this);
-			$btn.removeClass('btn->mary');
+			$btn.removeClass('btn-primary');
 			$btn.addClass('btn-primary');
 			$(".btn-grid-view").removeClass('btn-primary');
 
@@ -237,7 +237,7 @@ webshop.ProductView =  class {
 			localStorage.setItem("product_view", "List View");
 		});
 
-		$("#image-view").click(function() {
+		$("#image-view").click(function () {
 			let $btn = $(this);
 			$btn.removeClass('btn-primary');
 			$btn.addClass('btn-primary');
@@ -292,7 +292,7 @@ webshop.ProductView =  class {
 		if (filter_data) {
 			$("#product-filters").append(`
 				<div id="discount-filters" class="mb-4 filter-block pb-5">
-					<div class="filter-label mb-3">${ __("Discounts") }</div>
+					<div class="filter-label mb-3">${__("Discounts")}</div>
 				</div>
 			`);
 
@@ -300,16 +300,16 @@ webshop.ProductView =  class {
 			filter_data.forEach(filter => {
 				html += `
 					<div class="checkbox">
-						<label data-value="${ filter[0] }">
+						<label data-value="${filter[0]}">
 							<input type="radio"
 								class="product-filter discount-filter"
-								name="discount" id="${ filter[0] }"
+								name="discount" id="${filter[0]}"
 								data-filter-name="discount"
-								data-filter-value="${ filter[0] }"
+								data-filter-value="${filter[0]}"
 								style="width: 14px !important"
 							>
-								<span class="label-area" for="${ filter[0] }">
-									${ filter[1] }
+								<span class="label-area" for="${filter[0]}">
+									${filter[1]}
 								</span>
 						</label>
 					</div>
@@ -459,7 +459,7 @@ webshop.ProductView =  class {
 
 	restore_filters_state() {
 		const filters = frappe.utils.get_query_params();
-		let {field_filters, attribute_filters} = filters;
+		let { field_filters, attribute_filters } = filters;
 
 		if (field_filters) {
 			field_filters = JSON.parse(field_filters);
@@ -485,7 +485,7 @@ webshop.ProductView =  class {
 		}
 	}
 
-	render_no_products_section(error=false) {
+	render_no_products_section(error = false) {
 		let error_section = `
 			<div class="mt-4 w-100 alert alert-error font-md">
 				Something went wrong. Please refresh or contact us.
@@ -496,7 +496,7 @@ webshop.ProductView =  class {
 				<div class="cart-empty-state">
 					<img src="/assets/webshop/images/cart-empty-state.png" alt="Empty Cart">
 				</div>
-				<div class="cart-empty-message mt-4">${ __('No products found') }</p>
+				<div class="cart-empty-message mt-4">${__('No products found')}</p>
 			</div>
 		`;
 
@@ -511,9 +511,9 @@ webshop.ProductView =  class {
 
 			categories.forEach(category => {
 				sub_group_html += `
-					<a href="/${ category.route || '#' }" style="text-decoration: none;">
+					<a href="/${category.route || '#'}" style="text-decoration: none;">
 						<div class="category-pill">
-							${ category.name }
+							${category.name}
 						</div>
 					</a>
 				`;
