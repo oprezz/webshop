@@ -155,8 +155,8 @@ $.extend(shopping_cart, {
 			method: "webshop.webshop.shopping_cart.cart.place_order",
 			btn: btn,
 			callback: function (r) {
+				shopping_cart.unfreeze();
 				if (r.exc) {
-					shopping_cart.unfreeze();
 					var msg = "";
 					if (r._server_messages) {
 						msg = JSON.parse(r._server_messages || []).join("<br>");

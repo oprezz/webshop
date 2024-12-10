@@ -88,7 +88,12 @@ def get_billing_addresses(party=None):
 
 @frappe.whitelist()
 def place_order():
+
     quotation = _get_cart_quotation()
+
+    if quotation.custom_delivery_date is None:
+        frappe.throw(_("Please set a delivery date"))
+
     cart_settings = frappe.get_cached_doc("Webshop Settings")
     quotation.company = cart_settings.company
 
@@ -131,9 +136,7 @@ def place_order():
                         )
                     )
 
-    if quotation.custom_delivery_date is not None:
-        sales_order.delivery_date = quotation.custom_delivery_date
-
+    sales_order.delivery_date = quotation.custom_delivery_date
     sales_order.flags.ignore_permissions = True
     sales_order.insert()
     sales_order.submit()
