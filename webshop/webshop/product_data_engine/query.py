@@ -251,6 +251,8 @@ class ProductQuery:
                         "item_code": item.item_code, "parent": frappe.session.user}
             ):
                 item.wished = True
+            if product_info and ("weekly_availability" in product_info):
+                item["weekly_availability"] = product_info["weekly_availability"]
 
         return result, discount_list
 

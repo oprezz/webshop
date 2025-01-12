@@ -148,27 +148,25 @@ $.extend(shopping_cart, {
 	},
 
 	place_order: function (btn) {
-		shopping_cart.freeze();
+		//shopping_cart.freeze();
 
 		return frappe.call({
 			type: "POST",
 			method: "webshop.webshop.shopping_cart.cart.place_order",
 			btn: btn,
+			freeze: true,
 			callback: function (r) {
-				shopping_cart.unfreeze();
+				//shopping_cart.unfreeze();
 				if (r.exc) {
-					var msg = "";
-					if (r._server_messages) {
-						msg = JSON.parse(r._server_messages || []).join("<br>");
-					}
-
+					// Error returned from the backend
+					const msg = r.exc || frappe._("Something went wrong!");
 					$("#cart-error")
 						.empty()
-						.html(msg || frappe._("Something went wrong!"))
+						.html(msg)
 						.toggle(true);
 				} else {
 					$(btn).hide();
-					window.location.href = '/orders/' + encodeURIComponent(r.message);
+					window.location.href = '/corders/' + encodeURIComponent(r.message);
 				}
 			}
 		});

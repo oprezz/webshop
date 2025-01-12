@@ -12,12 +12,12 @@
 
 		<!-- Wishlist -->
 		{% if cart_settings.enable_wishlist %}
-			<div class="like-action-item-fp like-action {{ 'like-action-wished' if wished else ''}} ml-2"
-				data-item-code="{{ doc.item_code }}">
-				<svg class="icon sm">
-					<use class="{{ 'wished' if wished else 'not-wished' }} wish-icon" href="#icon-heart"></use>
-				</svg>
-			</div>
+		<div class="like-action-item-fp like-action {{ 'like-action-wished' if wished else ''}} ml-2"
+			data-item-code="{{ doc.item_code }}">
+			<svg class="icon sm">
+				<use class="{{ 'wished' if wished else 'not-wished' }} wish-icon" href="#icon-heart"></use>
+			</svg>
+		</div>
 		{% endif %}
 	</div>
 
@@ -37,21 +37,21 @@
 		<span itemprop="name">{{ _(doc.item_code) }}</span>
 	</p>
 	{% if has_variants %}
-		<!-- configure template -->
-		{% include "templates/generators/item/item_configure.html" %}
+	<!-- configure template -->
+	{% include "templates/generators/item/item_configure.html" %}
 	{% else %}
-		<!-- add variant to cart -->
-		{% include "templates/generators/item/item_add_to_cart.html" %}
+	<!-- add variant to cart -->
+	{% include "templates/generators/item/item_add_to_cart.html" %}
 	{% endif %}
 	<!-- description -->
 	<div class="product-description" itemprop="description">
-	{% if frappe.utils.strip_html(doc.web_long_description or '') %}
+		{% if frappe.utils.strip_html(doc.web_long_description or '') %}
 		{{ _(doc.web_long_description) | safe }}
-	{% elif frappe.utils.strip_html(doc.description or '')  %}
+		{% elif frappe.utils.strip_html(doc.description or '') %}
 		{{ _(doc.description) | safe }}
-	{% else %}
+		{% else %}
 		{{ "" }}
-	{% endif  %}
+		{% endif %}
 	</div>
 </div>
 
@@ -62,8 +62,8 @@
 
 <script>
 	$('.page_content').on('click', '.like-action-item-fp', (e) => {
-			// Bind action on wishlist button
-			const $btn = $(e.currentTarget);
-			webshop.webshop.wishlist.wishlist_action($btn);
-		});
+		// Bind action on wishlist button
+		const $btn = $(e.currentTarget);
+		webshop.webshop.wishlist.wishlist_action($btn);
+	});
 </script>

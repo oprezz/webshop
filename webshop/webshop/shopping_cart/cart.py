@@ -14,6 +14,7 @@ from webshop.webshop.doctype.webshop_settings.webshop_settings import (
     get_shopping_cart_settings,
 )
 from webshop.webshop.utils.product import get_web_item_qty_in_stock
+from webshop.webshop.shopping_cart.utils import get_day_from_datetime
 from erpnext.selling.doctype.quotation.quotation import _make_sales_order
 
 
@@ -86,13 +87,39 @@ def get_billing_addresses(party=None):
     ]
 
 
+def get_item_delivery_days(item_code):
+    delivery_days = []
+    website_item = frappe.get_cached_doc(
+        "Website Item", {"item_code": item_code}
+    )
+
+    if not website_item or not website_item.get("custom_available_on"):
+        return delivery_days
+
+    for day in website_item.get("custom_available_on"):
+        delivery_days.append(day.get("day"))
+
+    return delivery_days
+
+
+def check_item_delivery_avalability(item_code, delviery_date):
+    return get_day_from_datetime(delviery_date) in get_item_delivery_days(item_code)
+
+
 @frappe.whitelist()
 def place_order():
 
     quotation = _get_cart_quotation()
 
     if quotation.custom_delivery_date is None:
-        frappe.throw(_("Please set a delivery date"))
+        return frappe.throw(title='Error', msg=_("Please set a delivery date"), exc=frappe.ValidationError)
+
+    for item in quotation.items:
+        if not check_item_delivery_avalability(item.item_code, quotation.custom_delivery_date):
+            return frappe.throw(title='Error', msg=_("Item {0} is not available for delivery on {1}.").format(
+                item.item_name, get_day_from_datetime(
+                    quotation.custom_delivery_date)
+            ), exc=frappe.ValidationError)
 
     cart_settings = frappe.get_cached_doc("Webshop Settings")
     quotation.company = cart_settings.company
@@ -147,7 +174,7 @@ def place_order():
     return sales_order.name
 
 
-@frappe.whitelist()
+@ frappe.whitelist()
 def set_delivery_date(delivery_date):
     quotation = _get_cart_quotation()
     quotation.flags.ignore_permissions = True
@@ -156,7 +183,7 @@ def set_delivery_date(delivery_date):
     return
 
 
-@frappe.whitelist()
+@ frappe.whitelist()
 def request_for_quotation():
     quotation = _get_cart_quotation()
     quotation.flags.ignore_permissions = True
@@ -169,7 +196,7 @@ def request_for_quotation():
     return quotation.name
 
 
-@frappe.whitelist()
+@ frappe.whitelist()
 def update_cart(item_code, qty, additional_notes=None, with_items=False):
     quotation = _get_cart_quotation()
 
@@ -234,7 +261,7 @@ def update_cart(item_code, qty, additional_notes=None, with_items=False):
         return {"name": quotation.name}
 
 
-@frappe.whitelist()
+@ frappe.whitelist()
 def get_shopping_cart_menu(context=None):
     if not context:
         context = get_cart_quotation()
@@ -242,7 +269,7 @@ def get_shopping_cart_menu(context=None):
     return frappe.render_template("templates/includes/cart/cart_dropdown.html", context)
 
 
-@frappe.whitelist()
+@ frappe.whitelist()
 def add_new_address(doc):
     doc = frappe.parse_json(doc)
     doc.update({"doctype": "Address"})
@@ -252,7 +279,7 @@ def add_new_address(doc):
     return address
 
 
-@frappe.whitelist(allow_guest=True)
+@ frappe.whitelist(allow_guest=True)
 def create_lead_for_item_inquiry(lead, subject, message):
     lead = frappe.parse_json(lead)
     lead_doc = frappe.new_doc("Lead")
@@ -289,12 +316,12 @@ def create_lead_for_item_inquiry(lead, subject, message):
     return lead_doc
 
 
-@frappe.whitelist()
+@ frappe.whitelist()
 def get_terms_and_conditions(terms_name):
     return frappe.db.get_value("Terms and Conditions", terms_name, "terms")
 
 
-@frappe.whitelist()
+@ frappe.whitelist()
 def update_cart_address(address_type, address_name):
     quotation = _get_cart_quotation()
     address_doc = frappe.get_doc("Address", address_name).as_dict()
@@ -702,7 +729,7 @@ def get_address_docs(
     return out
 
 
-@frappe.whitelist()
+@ frappe.whitelist()
 def apply_shipping_rule(shipping_rule):
     quotation = _get_cart_quotation()
 
@@ -787,7 +814,7 @@ def show_terms(doc):
     return doc.tc_name
 
 
-@frappe.whitelist(allow_guest=True)
+@ frappe.whitelist(allow_guest=True)
 def apply_coupon_code(applied_code, applied_referral_sales_partner):
     quotation = True
 
@@ -795,7 +822,7 @@ def apply_coupon_code(applied_code, applied_referral_sales_partner):
         frappe.throw(_("Please enter a coupon code"))
 
     coupon_list = frappe.get_all("Coupon Code", filters={
-                                 "coupon_code": applied_code})
+        "coupon_code": applied_code})
     if not coupon_list:
         frappe.throw(_("Please enter a valid coupon code"))
 
