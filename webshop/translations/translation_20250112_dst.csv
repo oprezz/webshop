@@ -1,0 +1,335 @@
+Rólunk
+Műveletek
+Szakasz hozzáadása lapokkal
+Új cím hozzáadása
+Jegyzetek hozzáadása
+Adja a kosárhoz
+Hozzáadás az ajánlathoz
+Kiegészítések
+1. cím sor
+2. cím sor
+Cím neve
+Cím típusa
+Speciális tartalom megjelenítése
+A fizetés befejezése után a felhasználót átirányítja a kiválasztott oldalra.
+Minden termék
+Hagyja, hogy a készletben nem lévő tételek kosárba kerüljenek
+Már közzétett
+Összeg
+Alkalmazott kuponkód
+Kuponkód alkalmazása
+Alkalmazások
+Mellékletek
+Jellemzők
+Elérhető
+Elérhető előrendelésre
+Számlázási cím
+A számlázási cím megegyezik a szállítási címmel
+Márka
+Nem lehet összevonni
+Nem találja a megfelelő tételt. Kérjük, válasszon másik értéket erre {0}.
+A kosár üres
+Kategóriák
+Változtatás
+Kijelentkezés
+Kijelentkezés beállítások
+Város
+Törlés
+Minden törlése
+Értékek törlése
+Értékek törlése
+Megjegyzés
+Vállalat
+Lépjen kapcsolatba velünk
+Tartalom
+Választás folytatása
+Vásárlás folytatása
+Másolás tétel csoportból
+Ország
+Kuponok
+Vevő
+Vevői vélemények
+Követelések ({0})
+Alapértelmezett vevői csoport
+Szállítás elérhető
+Leírás
+Kedvezmények
+További információk megjelenítése
+Képek megjelenítése
+Információk megjelenítése
+Megjelenítési beállítások
+Dokumentáció
+Szerkesztés
+Email
+Attribútumszűrők engedélyezése
+Fizetés engedélyezése
+Mezőszűrők (Kategóriák) engedélyezése
+Ajánlások engedélyezése
+Redisearch engedélyezése
+Vélemények és értékelések engedélyezése
+Bevásárlókosár engedélyezése
+Változatválasztás engedélyezése
+Kívánságlista engedélyezése
+Írjon be egy értéket {0} és {1} között
+Kívánt szállítási dátum
+Fedezd fel
+INGYENES
+Szűrőmező sor #{0}: A(z) {1} mezőnek 'Link' vagy 'Táblázat többválasztásos' típusúnak kell lennie
+Szűrők
+Szűrők és kategóriák
+Kövesse ezeket a lépéseket egy landing oldal létrehozásához az üzletéhez
+Frappe Iskola
+Frappe Támogatás
+Pé
+Péntek
+Teljes név
+Kosárhoz
+Ajánlathoz
+Teljes összeg
+Vendég megjelenítési beállítások
+Változatokkal rendelkezik
+Ár elrejtése a vendégek számára
+Változatok elrejtése
+Kezdő oldal
+Kezdőlap Ajánlott termék
+Kép
+Kép alternatív szövege
+Képleírás
+Kép megtekintése
+Raktáron
+Jelölje meg, hogy a tétel előrendelhető és általában nincs raktáron
+Számlák
+Redisearch betöltve
+Termék
+Tételkód
+Tételkód szükséges
+Tétel leírása
+Elem Részletek
+Termékcsoport
+Tétel Kép (ha nem slideshow)
+Termék neve
+Termék vélemény
+Tétel keresési beállítások
+A(z) {0} tétel nem elérhető a(z) {1}. szállításra.
+Termékek
+A magasabb rangsorolású elemek feljebb lesznek megjelenítve
+Billentyűparancsok
+Címke
+Hivatkozás a vendég átirányítására olyan műveletek esetén, amelyek bejelentkezést igényelnek, például a kosárba helyezés, a kívánságlista stb. <b>Például: /login</b>
+Sorolja ezeket a tételeket több csoportba a weboldalon.
+Betöltés...
+Kijelentkezés
+Beszerzési számla készítése
+Kötelező
+Üzenet
+Hiányzó
+Hiányzó pénznem
+Hé
+Hétfő
+Tovább
+További információ
+Részletek
+Tovább...
+Kosárba helyezés
+Fiókom
+Profilom
+Beállításaim
+Elnevezési sorozatok
+Nettó összesen
+Nettó összesen (
+Új cím
+Következő
+Nincsenek vélemények
+Nem található termék
+Nincs érték
+Nem engedélyezett
+Nincs közzététel
+Nincs raktáron
+Jegyzet
+Ajánlat részletei
+Ajánlat alcíme
+Ajánlat címe
+Ajánlatok
+Megjelenítendő ajánlatok
+Előrendelhető
+Csak {0} van raktáron a (z) {1} cikknél
+Rendelések
+Vállalkozás neve
+Elfogyott
+Korábbi rendelések
+Korábbi ajánlatok
+Fizetés
+Fennmaradó fizetése
+Fizetési átjáró számla fiókja
+Fizetési átjáró számla nincs beállítva
+Fizetés sikeres URL
+Fizetési összegzés
+Függőben
+Telefonszám
+Megrendelés
+Kérjük, adja meg a kuponkódot
+Kérjük, adjon meg érvényes kuponkódot
+Kérjük, állítson be szállítási dátumot
+Irányítószám
+Előző
+Ár
+Árlista
+Árak
+Az árak nem jelennek meg, ha az Árlista nincs beállítva
+Nyomtatás
+Termék részletek
+Termék keresés
+Termékek
+Termékek oldalanként
+Közzététel a weboldalon
+Közzétett
+Megjelent
+Termék közzététele...
+Menny.
+Mennyiség
+Árajánlat sorozat
+Rangsor
+Ár
+Ár:
+Értékelés
+Legutóbbi
+Ajánlott tételek
+Ajánlott/Hasonló tételek
+Művelet átirányítása
+Redisearch hiba
+Redisearch figyelmeztetés
+Frissítés
+Hiba jelentése
+Ajánlatkérés
+Vélemény elküldve
+Vélemény címe
+Vélemények
+Útvonal
+Sor #{0}: A(z) {1} tételnek weboldal termékre van szüksége a bevásárlókosár ajánlathoz
+Szo
+Szombat
+Mentés
+Ajánlat mentése vázlatként
+Megtakarítás
+Keresési index mezők
+Keresési eredmények
+Keresés és SEO
+Keresési eredmények erre
+Korábbi rendelések megtekintése
+Korábbi ajánlatok megtekintése
+Változat kiválasztása
+Változat kiválasztása a következőhöz: {0}
+Küldés
+Munkamenet beállításai
+Cím beállítása
+Metacímkék beállítása
+Állítson be szállítási címet vagy számlázási címet
+Adózási szabály megadása a bevásárlókosárhoz
+Szállítási cím
+Vásárlás kategóriák szerint
+Kosár
+Rövid leírás a listanézethez
+Rövid weboldal leírás
+Kuponkód alkalmazása
+Kapcsolat gomb megjelenítése
+Árak megjelenítése
+Ár megjelenítése az ajánlatban
+Nyilvános mellékletek megjelenítése
+Raktárkészlet elérhetőségének megjelenítése
+Készlet mennyiség megjelenítése
+Raktárkészlet elérhetőségének megjelenítése ezen raktár alapján.
+Diavetítés megjelenítése az oldal tetején
+Diavetítés
+Hiba történt!
+Hiba történt. Ellenőrizze {0}
+Sajnáljuk, valami hiba történt. Kérjük, frissítse az oldalt!
+Megye
+Készlet
+Készlet információ
+Készletkezelő menedzser
+Készlet alapértelmezett mértékegység
+Készletkezelő felhasználó
+Tárgy
+Elküld
+Elküldve
+Vélemény elküldése...
+Részösszeg
+Va
+Vasárnap
+Rendszer menedzser
+Lapok
+Sablon
+Általános Szerződési Feltételek
+Köszönjük, hogy elküldte véleményét
+Köszönjük a véleményét
+A mezőszűrők működni fognak kategóriaként a <b>Vásárlás kategóriák szerint</b> oldalon.
+Ezt a tételt csak ezeken a napokon lehet rendelni.
+Csü
+Miniatűr
+Csütörtök
+Teljes szélesség váltása
+Téma váltása
+Összesen
+Összeg
+Ke
+Kedd
+Mértékegység
+Nem közzétett tétel
+Felhasználó
+Felhasználói fórum
+Eddig érvényes
+Az értéknek {0} és {1} között kell lennie
+Változat
+Változata
+Változata
+Nézet
+Továbbiak megtekintése
+Weboldal megtekintése
+Weboldal tétel megtekintése
+Összes vélemény megtekintése
+Kosár megtekintése
+Ajánlat megtekintése
+Raktár
+Figyelmeztetés: Érvénytelen SSL tanúsítvány a {0} mellékleten
+Figyelmeztetés: Érvénytelen melléklet {0}
+Webáruház
+Webáruház beállítások
+Weboldal tartalma
+Weboldal leírása
+Weboldal kép
+A weboldal képnek nyilvános fájlnak vagy weboldal URL-nek kell lennie
+A(z) {0} weboldal kép, amely csatolva lett a(z) {1} tételhez, nem található
+Weboldal termék
+Weboldal termék mezők
+Weboldal termék csoportok
+Weboldal termék kép
+Weboldal termék neve
+Weboldal termék lapozható szakasz
+Weboldal termék miniatűr kép
+Weboldal termék már létezik a(z) {0} tételhez
+Weboldal termék már létezik a(z) {0} tételhez
+Weboldal termék nem található
+Weboldal termék {0} létrehozva.
+Weboldal menedzser
+Weboldal ajánlat
+Weboldal specifikációk
+Weboldal raktár
+Weboldal megjelenítési neve
+Sze
+Szerda
+Kívánságlista
+Kívánságlistás tétel
+Kívánságlista üres!
+A kívánságlista üres!
+Vélemény írása
+Ön még nem ellenőrzött vásárló. Kérjük, lépjen kapcsolatba velünk a folytatáshoz.
+Ön még nem ellenőrzött felhasználó a vélemény írásához.
+Bármely érvényes Bootstrap 4 jelölést felhasználhat ebben a mezőben. Ez a cikk oldalán jelenik meg.
+Be kell kapcsolnia a bevásárlókosarat
+A kosara üres
+5-ből
+értékelések
+{0} nincs raktáron
+{0} nem érvényes lehetőség a Keresési index mezőhöz.
+{0} elem található.
+{0} elem található.

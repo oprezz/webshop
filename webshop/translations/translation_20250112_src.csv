@@ -1,0 +1,335 @@
+About
+Actions
+Add Section with Tabs
+Add a new address
+Add notes
+Add to Cart
+Add to Quote
+Add-ons
+Address Line 1
+Address Line 2
+Address Title
+Address Type
+Advanced Display Content
+After payment completion redirect user to selected page.
+All Products
+Allow items not in stock to be added to cart
+Already Published
+Amount
+Applied Coupon Code
+Apply Coupon Code
+Apps
+Attachments
+Attributes
+Available on
+Available on backorder
+Billing Address
+Billing Address is same as Shipping Address
+Brand
+Cannot Merge
+Cannot find a matching Item. Please select some other value for {0}.
+Cart is Empty
+Categories
+Change
+Checkout
+Checkout Settings
+City/Town
+Clear
+Clear All
+Clear Values
+Clear values
+Comment
+Company
+Contact Us
+Content
+Continue Selection
+Continue Shopping
+Copy From Item Group
+Country
+Coupons
+Customer
+Customer Reviews
+Debtors ({0})
+Default Customer Group
+Delivery available on
+Description
+Discounts
+Display Additional Information
+Display Images
+Display Information
+Display Settings
+Documentation
+Edit
+Email
+Enable Attribute Filters
+Enable Checkout
+Enable Field Filters (Categories)
+Enable Recommendations
+Enable Redisearch
+Enable Reviews and Ratings
+Enable Shopping Cart
+Enable Variant Selection
+Enable Wishlist
+Enter value betweeen {0} and {1}
+Expected Delivery Date
+Explore,
+FREE
+Filter Fields Row #{0}: Fieldname {1} must be of type 'Link' or 'Table MultiSelect'
+Filters
+Filters and Categories
+Follow these steps to create a landing page for your store
+Frappe School
+Frappe Support
+Fri
+Friday
+Full Name
+Go to Cart
+Go to Quote
+Grand Total
+Guest Display Settings
+Has Variants
+Hide Price for Guest
+Hide Variants
+Home
+Homepage Featured Product
+Image
+Image Alternative Text
+Image Description
+Image View
+In stock
+Indicate that Item is available on backorder and not usually pre-stocked
+Invoices
+Is Redisearch Loaded
+Item
+Item Code
+Item Code is required
+Item Description
+Item Details
+Item Group
+Item Image (if not slideshow)
+Item Name
+Item Review
+Item Search Settings
+Item {0} is not available for delivery on {1}.
+Items
+Items with higher ranking will be shown higher
+Keyboard Shortcuts
+Label
+Link to redirect Guest on actions that need login such as add to cart, wishlist, etc. <b>E.g.: /login</b>
+List this Item in multiple groups on the website.
+Loading...
+Log out
+Make Purchase Invoice
+Mandatory
+Message
+Missing
+Missing Currency
+Mon
+Monday
+More
+More Information
+More details
+More...
+Move to Cart
+My Account
+My Profile
+My Settings
+Naming Series
+Net Total
+Net Total (
+New Address
+Next
+No Reviews
+No products found
+No values
+Not Permitted
+Not Published
+Not in stock
+Note
+Offer Details
+Offer Subtitle
+Offer Title
+Offers
+Offers to Display
+On Backorder
+Only {0} in Stock for item {1}
+Orders
+Organization Name
+Out of stock
+Past Orders
+Past Quotes
+Pay
+Pay Remaining
+Payment Gateway Account
+Payment Gateway Account not set
+Payment Success Url
+Payment Summary
+Pending
+Phone Number
+Place Order
+Please enter a coupon code
+Please enter a valid coupon code
+Please set a delivery date
+Postal Code
+Prev
+Price
+Price List
+Prices
+Prices will not be shown if Price List is not set
+Print
+Product Details
+Product Search
+Products
+Products per Pagem
+Publish in Website
+Published
+Published on
+Publishing Item ...
+Qty
+Quantity
+Quotation Series
+Ranking
+Rate
+Rate:
+Rating
+Recent
+Recommended Items
+Recommended/Similar Items
+Redirect on Action
+Redisearch Error
+Redisearch Warning
+Reload
+Report an Issue
+Request for Quote
+Review Submitted
+Review Title
+Reviews
+Route
+Row #{0}: Item {1} must have a Website Item for Shopping Cart Quotations
+Sat
+Saturday
+Save
+Save Quotations as Draft
+Savings
+Search Index Fields
+Search Results
+Search and SEO
+Search results for
+See past orders
+See past quotations
+Select Variant
+Select Variant for {0}
+Send
+Session Defaults
+Set Address
+Set Meta Tags
+Set Shipping Address or Billing Address
+Set Tax Rule for shopping cart
+Shipping Address
+Shop by Category
+Shopping Cart
+Short Description for List View
+Short Website Description
+Show Apply Coupon Code
+Show Contact Us Button
+Show Price
+Show Price in Quotation
+Show Public Attachments
+Show Stock Availability
+Show Stock Quantity
+Show Stock availability based on this warehouse.
+Show a slideshow at the top of the page
+Slideshow
+Something went wrong!
+Something went wrong. Check {0}
+Sorry, something went wrong. Please refresh.
+State
+Stock
+Stock Information
+Stock Manager
+Stock UOM
+Stock User
+Subject
+Submit
+Submitted
+Submitting Review ...
+Subtotal
+Sun
+Sunday
+System Manager
+Tabs
+Template
+Terms and Conditions
+Thank you for submitting your review
+Thank you for the review
+The field filters will also work as categories in the <b>Shop by Category</b> page.
+This item can be only ordered for delivery on these days.
+Thu
+Thumbnail
+Thursday
+Toggle Full Width
+Toggle Theme
+Total
+Total Amount
+Tue
+Tuesday
+UOM
+Unpublished Item
+User
+User Forum
+Valid Till
+Value must be between {0} and {1}
+Variant
+Variant Of
+Variant of
+View
+View More
+View Website
+View Website Item
+View all reviews
+View in Cart
+View in Quote
+Warehouse
+Warning: Invalid SSL certificate on attachment {0}
+Warning: Invalid attachment {0}
+Webshop
+Webshop Settings
+Website Content
+Website Description
+Website Image
+Website Image should be a public file or website URL
+Website Image {0} attached to Item {1} cannot be found
+Website Item
+Website Item Fields
+Website Item Groups
+Website Item Image
+Website Item Name
+Website Item Tabbed Section
+Website Item Thumbnail
+Website Item already exists against Item {0}
+Website Item already exists against {0}
+Website Item not found
+Website Item {0} has been created.
+Website Manager
+Website Offer
+Website Specifications
+Website Warehouse
+Website display name
+Wed
+Wednesday
+Wishlist
+Wishlist Item
+Wishlist is empty !
+Wishlist is empty!
+Write a Review
+You are not a verified customer yet. Please contact us to proceed.
+You are not verified to write a review yet.
+You can use any valid Bootstrap 4 markup in this field. It will be shown on your Item Page.
+You need to enable Shopping Cart
+Your cart is Empty
+out of 5
+ratings
+{0} Not in Stock
+{0} are not valid options for Search Index Field.
+{0} item found.
+{0} items found.
