@@ -107,7 +107,7 @@ webshop.ProductList = class {
 		details += this.get_weekly_availability(item);
 
 		details += `
-			<div class="product-price col-2 d-flex" itemprop="offers"  itemscope itemtype="https://schema.org/AggregateOffer" style="float: right;">
+			<div class="product-price col-3 d-flex" itemprop="offers"  itemscope itemtype="https://schema.org/AggregateOffer" style="float: right;">
 			${item.formatted_price || ''}
 			`;
 
