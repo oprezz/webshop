@@ -135,7 +135,7 @@ webshop.ProductGrid = class {
 					<s>${item.formatted_mrp ? item.formatted_mrp.replace(/ +/g, "") : ""}</s>
 				</small>
 				<small class="ml-1 product-info-green">
-					${item.discount} OFF
+					${item.discount} ${__("OFF")}
 				</small>
 			`;
 		}
@@ -222,7 +222,7 @@ webshop.ProductGrid = class {
 			return `
 				<a href="/${item.route || '#'}">
 					<div class="btn btn-sm btn-explore-variants w-100 mt-4">
-						${__('Explore')}
+						${__("Explore")}
 					</div>
 				</a>
 			`;
@@ -237,7 +237,7 @@ webshop.ProductGrid = class {
 							<use href="#icon-assets"></use>
 						</svg>
 					</span>
-					${settings.enable_checkout ? __('Add to Cart') : __('Add to Quote')}
+					${settings.enable_checkout ? __("Add to Cart") : __("Add to Quote")}
 				</div>
 
 				<a href="/cart">
@@ -246,7 +246,7 @@ webshop.ProductGrid = class {
 						w-100 mt-4 go-to-cart-grid
 						${item.in_cart ? '' : 'hidden'}"
 						data-item-code="${item.item_code}">
-						${settings.enable_checkout ? __('Go to Cart') : __('Go to Quote')}
+						${settings.enable_checkout ? __("Go to Cart") : __("Go to Quote")}
 					</div>
 				</a>
 			`;
