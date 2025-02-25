@@ -52,6 +52,7 @@ def get_cart_quotation(doc=None):
         "billing_addresses": get_billing_addresses(party),
         "shipping_rules": get_applicable_shipping_rules(party),
         "cart_settings": frappe.get_cached_doc("Webshop Settings"),
+        "customer_settings": get_customer_settings(doc, party),
     }
 
 
@@ -772,6 +773,11 @@ def get_shipping_rules(quotation=None, cart_settings=None):
     if not quotation:
         quotation = _get_cart_quotation()
 
+    customer = frappe.get_cached_doc("Customer", quotation.party_name)
+
+    if customer and customer.custom_shipping_rule:
+        return [customer.custom_shipping_rule]
+
     shipping_rules = []
     if quotation.shipping_address_name:
         country = frappe.db.get_value(
@@ -812,6 +818,24 @@ def get_address_territory(address_name):
 
 def show_terms(doc):
     return doc.tc_name
+
+
+def get_customer_settings(doc, party=None):
+    if not party:
+        party = get_party()
+
+    customer = frappe.get_cached_doc("Customer", party.name)
+    
+    exceeds_minimum_order_value = False
+    if customer.custom_minimum_order_value and doc.total:
+        exceeds_minimum_order_value = customer.custom_minimum_order_value < doc.total
+
+    return {
+        "customer": customer,
+        "currency": frappe.get_doc("Currency", customer.default_currency).symbol or "",
+        "minimum_order_amount": round(customer.custom_minimum_order_value) or 0,
+        "exceeds_minimum_order_value": exceeds_minimum_order_value,
+    }
 
 
 @ frappe.whitelist(allow_guest=True)
