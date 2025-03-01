@@ -17,13 +17,13 @@
 
 			<!-- taxes -->
 			{% for d in doc.taxes %}
-			{% if d.base_tax_amount %}
+			{% if d.tax_amount or d.base_tax_amount %}
 			<tr>
 				<td class="bill-label">
 					{{ d.description }}
 				</td>
 				<td class="bill-content text-right">
-					{{ d.get_formatted("base_tax_amount") }}
+					{{ d.get_formatted("tax_amount") if d.tax_amount else d.get_formatted("base_tax_amount") }}
 				</td>
 			</tr>
 			{% endif %}
