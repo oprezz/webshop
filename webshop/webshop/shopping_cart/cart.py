@@ -175,7 +175,7 @@ def place_order():
     return sales_order.name
 
 
-@ frappe.whitelist()
+@frappe.whitelist()
 def set_delivery_date(delivery_date):
     quotation = _get_cart_quotation()
     quotation.flags.ignore_permissions = True
@@ -184,7 +184,7 @@ def set_delivery_date(delivery_date):
     return
 
 
-@ frappe.whitelist()
+@frappe.whitelist()
 def request_for_quotation():
     quotation = _get_cart_quotation()
     quotation.flags.ignore_permissions = True
@@ -197,7 +197,7 @@ def request_for_quotation():
     return quotation.name
 
 
-@ frappe.whitelist()
+@frappe.whitelist()
 def update_cart(item_code, qty, additional_notes=None, with_items=False):
     quotation = _get_cart_quotation()
 
@@ -262,7 +262,7 @@ def update_cart(item_code, qty, additional_notes=None, with_items=False):
         return {"name": quotation.name}
 
 
-@ frappe.whitelist()
+@frappe.whitelist()
 def get_shopping_cart_menu(context=None):
     if not context:
         context = get_cart_quotation()
@@ -270,7 +270,7 @@ def get_shopping_cart_menu(context=None):
     return frappe.render_template("templates/includes/cart/cart_dropdown.html", context)
 
 
-@ frappe.whitelist()
+@frappe.whitelist()
 def add_new_address(doc):
     doc = frappe.parse_json(doc)
     doc.update({"doctype": "Address"})
@@ -280,7 +280,7 @@ def add_new_address(doc):
     return address
 
 
-@ frappe.whitelist(allow_guest=True)
+@frappe.whitelist(allow_guest=True)
 def create_lead_for_item_inquiry(lead, subject, message):
     lead = frappe.parse_json(lead)
     lead_doc = frappe.new_doc("Lead")
@@ -317,12 +317,12 @@ def create_lead_for_item_inquiry(lead, subject, message):
     return lead_doc
 
 
-@ frappe.whitelist()
+@frappe.whitelist()
 def get_terms_and_conditions(terms_name):
     return frappe.db.get_value("Terms and Conditions", terms_name, "terms")
 
 
-@ frappe.whitelist()
+@frappe.whitelist()
 def update_cart_address(address_type, address_name):
     quotation = _get_cart_quotation()
     address_doc = frappe.get_doc("Address", address_name).as_dict()
@@ -730,7 +730,7 @@ def get_address_docs(
     return out
 
 
-@ frappe.whitelist()
+@frappe.whitelist()
 def apply_shipping_rule(shipping_rule):
     quotation = _get_cart_quotation()
 
@@ -825,8 +825,8 @@ def get_customer_settings(doc, party=None):
         party = get_party()
 
     customer = frappe.get_cached_doc("Customer", party.name)
-    
-    exceeds_minimum_order_value = False
+
+    exceeds_minimum_order_value = True
     if customer.custom_minimum_order_value and doc.total:
         exceeds_minimum_order_value = customer.custom_minimum_order_value < doc.total
 
@@ -838,7 +838,7 @@ def get_customer_settings(doc, party=None):
     }
 
 
-@ frappe.whitelist(allow_guest=True)
+@frappe.whitelist(allow_guest=True)
 def apply_coupon_code(applied_code, applied_referral_sales_partner):
     quotation = True
 
