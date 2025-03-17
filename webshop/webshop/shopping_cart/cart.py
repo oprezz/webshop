@@ -830,9 +830,14 @@ def get_customer_settings(doc, party=None):
     if customer.custom_minimum_order_value and doc.total:
         exceeds_minimum_order_value = customer.custom_minimum_order_value < doc.total
 
+    default_currency_symbol = ""
+    if customer.default_currency:
+        default_currency_symbol = frappe.get_doc(
+            "Currency", customer.default_currency).symbol
+
     return {
         "customer": customer,
-        "currency": frappe.get_doc("Currency", customer.default_currency).symbol or "",
+        "currency": default_currency_symbol,
         "minimum_order_amount": round(customer.custom_minimum_order_value) or 0,
         "exceeds_minimum_order_value": exceeds_minimum_order_value,
     }
