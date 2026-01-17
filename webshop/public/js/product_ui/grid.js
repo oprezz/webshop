@@ -144,57 +144,23 @@ webshop.ProductGrid = class {
 	}
 
 	get_weekly_availability(item) {
-		// List of available days (customize this array)
 		const availableDays = item.weekly_availability || [];
 
-		// All days of the week to display
-		const allDays = [
-			__("Mon"),
-			__("Tue"),
-			__("Wed"),
-			__("Thu"),
-			__("Fri"),
-			__("Sat"),
-			__("Sun")
-		];
+		if (!availableDays.length) return "";
 
-		// All days of the week to check
-		const allDaysToCheck = [
-			"Monday",
-			"Tuesday",
-			"Wednesday",
-			"Thursday",
-			"Friday",
-			"Saturday",
-			"Sunday"
-		];
+		const dayMap = {
+			"Monday": "Mon", "Tuesday": "Tue", "Wednesday": "Wed",
+			"Thursday": "Thu", "Friday": "Fri", "Saturday": "Sat", "Sunday": "Sun"
+		};
 
-		// Start building the HTML table with smaller font and reduced padding
-		let tableHTML = `
-				<table style="width: 70%; border-collapse: collapse; text-align: center; font-size: 12px; line-height: 1.2;">
-					<!-- Header Row with "Delivery available on" -->
-					<tr>
-						<td colspan="7" style="border: 1px; background-color: lightgrey; font-weight: bold; font-size: 14px; text-align: center;">
-							${__("Delivery available on")}
-						</td>
-					</tr>
-					<!-- Days of the week -->
-					<tr>
-						${allDays.map(day => `<th style="border: 1px solid #ddd; padding: 4px; font-size: 13px; text-transform: capitalize;">${day}</th>`).join("")}
-					</tr>
-					<!-- Availability row with ticks/crosses -->
-					<tr>
-						${allDaysToCheck.map(day => {
-			const isAvailable = availableDays.includes(day);
-			const symbol = isAvailable ? "✔" : "✘";
-			const color = isAvailable ? "green" : "red";
-			return `<td style="border: 1px solid #ddd; padding: 4px; color: ${color}; font-weight: bold; font-size: 14px;">${symbol}</td>`;
-		}).join("")}
-					</tr>
-				</table>
-			`;
+		const badges = availableDays.map(day => {
+			return `<span style="display: inline-block; padding: 2px 5px; margin: 1px; border: 1px solid var(--primary-color); border-radius: 4px; color: var(--primary-color); font-size: 10px;">${dayMap[day]}</span>`;
+		}).join("");
 
-		return tableHTML;
+		return `<div class="mt-2 mb-2 d-flex flex-wrap" style="gap: 2px;">
+			<span style="font-size: 11px; margin-right: 5px; align-self: center;">${__("Delivery:")}</span>
+			${badges}
+		</div>`;
 	}
 
 	get_stock_availability(item, settings) {
@@ -227,28 +193,31 @@ webshop.ProductGrid = class {
 				</a>
 			`;
 		} else if (settings.enabled && (settings.allow_items_not_in_stock || item.in_stock)) {
-			return `
-				<div id="${item.name}" class="btn
-					btn-sm btn-primary btn-add-to-cart-list
-					w-100 mt-2 ${item.in_cart ? 'hidden' : ''}"
-					data-item-code="${item.item_code}">
-					<span class="mr-2">
-						<svg class="icon icon-md">
-							<use href="#icon-assets"></use>
-						</svg>
-					</span>
-					${settings.enable_checkout ? __("Add to Cart") : __("Add to Quote")}
-				</div>
+			const btnClass = item.in_cart ? 'hidden' : '';
+			const inCartBtnClass = item.in_cart ? '' : 'hidden';
 
-				<a href="/cart">
-					<div id="${item.name}" class="btn
-						btn-sm btn-primary btn-add-to-cart-list
-						w-100 mt-4 go-to-cart-grid
-						${item.in_cart ? '' : 'hidden'}"
-						data-item-code="${item.item_code}">
-						${settings.enable_checkout ? __("Go to Cart") : __("Go to Quote")}
+			return `
+				<div class="d-flex align-items-center mt-2 w-100 quantity-add-container">
+					<div class="input-group input-group-sm mr-2" style="width: 50px; flex: 0 0 50px;">
+						 <input type="number" class="form-control item-qty" value="1" min="1" step="1" 
+						 	style="padding: 0 0 0 5px; height: 28px; text-align: center;"
+						 	data-item-code="${item.item_code}">
 					</div>
-				</a>
+				
+					<div id="${item.name}" class="btn btn-sm btn-primary btn-add-to-cart-list flex-grow-1 ${btnClass}"
+						data-item-code="${item.item_code}"
+						style="padding: 0.25rem 0.5rem; display: flex; align-items: center; justify-content: center; min-width: 0;">
+						${settings.enable_checkout ? __("Add") : __("Add")}
+					</div>
+
+					<a href="/cart" class="w-100 ${inCartBtnClass}">
+						<div id="${item.name}" class="btn btn-sm btn-primary
+							w-100 go-to-cart-grid"
+							data-item-code="${item.item_code}">
+							${settings.enable_checkout ? __("Go to Cart") : __("Quote")}
+						</div>
+					</a>
+				</div>
 			`;
 		} else {
 			return ``;

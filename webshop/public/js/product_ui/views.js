@@ -207,7 +207,20 @@ webshop.ProductView = class {
 	}
 
 	render_view_toggler() {
-		$(".toolbar").append(`<div class="toggle-container col-4 p-0"></div>`);
+		$(".toolbar").append(`<div class="toggle-container col-4 p-0 d-flex justify-content-end align-items-center"></div>`);
+
+		// Mobile Filter Toggle
+		$(".toggle-container").append(`
+			<button class="btn btn-light d-md-none mr-2" type="button" 
+				data-toggle="collapse" data-target="#product-filters" 
+				aria-expanded="false" aria-controls="product-filters"
+				style="padding: 5px 10px; border: 1px solid var(--gray-300);">
+				<span class="mr-1" style="font-size: 12px;">Filters</span>
+				<svg class="icon icon-sm">
+					<use href="#icon-filter"></use>
+				</svg>
+			</button>
+		`);
 
 		["btn-list-view", "btn-grid-view"].forEach(view => {
 			let icon = view === "btn-list-view" ? "list" : "image-view";
