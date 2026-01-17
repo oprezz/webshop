@@ -1,0 +1,92 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("My Addresses") }}{% endblock %}
+
+{% block header %}
+<h3>{{ _("My Addresses") }}</h3>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ add_address_route }}" class="btn btn-primary btn-sm">
+	{{ _("Add New Address") }}
+</a>
+{% endblock %}
+
+{% block page_content %}
+<div class="my-addresses-container">
+
+	{% if not addresses %}
+	<div class="empty-state text-center py-5">
+		<img src="/assets/frappe/images/ui-states/list-empty-state.svg" alt="No Addresses"
+			style="max-width: 150px; opacity: 0.6;">
+		<p class="text-muted mt-3">{{ _("You haven't added any addresses yet.") }}</p>
+		<a href="{{ add_address_route }}" class="btn btn-outline-primary btn-sm mt-2">
+			{{ _("Create your first address") }}
+		</a>
+	</div>
+	{% else %}
+	<div class="row">
+		{% for addr in addresses %}
+		<div class="col-12 col-md-6 col-lg-4 mb-4">
+			<div class="card h-100 shadow-sm border-0 address-card">
+				<div class="card-body d-flex flex-column">
+					<div class="d-flex justify-content-between align-items-start mb-2">
+						<h6 class="card-title font-weight-bold mb-0 text-truncate" title="{{ addr.address_title }}">
+							{{ addr.address_title }}
+						</h6>
+						<div class="badges">
+							{% if addr.is_primary_address %}
+							<span class="badge badge-success text-uppercase" style="font-size: 10px;">{{ _("Primary")
+								}}</span>
+							{% endif %}
+							{% if addr.is_shipping_address and not addr.is_primary_address %}
+							<span class="badge badge-info text-uppercase" style="font-size: 10px;">{{ _("Shipping")
+								}}</span>
+							{% endif %}
+						</div>
+					</div>
+
+					<p class="card-text text-muted small flex-grow-1">
+						{{ addr.address_line1 }}<br>
+						{% if addr.city %} {{ addr.city }}, {% endif %}
+						{% if addr.state %} {{ addr.state }} <br> {% endif %}
+						{% if addr.country %} {{ addr.country }} {% endif %}
+						{% if addr.pincode %} - {{ addr.pincode }} {% endif %}
+						{% if addr.phone %}<br><br><i class="fa fa-phone mr-1"></i> {{ addr.phone }}{% endif %}
+					</p>
+
+					<div class="address-type-tag mb-3">
+						<span class="text-muted x-small text-uppercase font-weight-bold" style="letter-spacing: 0.5px;">
+							{{ addr.address_type }}
+						</span>
+					</div>
+
+					<div class="action-buttons pt-3 border-top">
+						<a href="/address/{{ addr.name }}?success_url=/my-addresses"
+							class="btn btn-block btn-outline-secondary btn-sm">
+							<i class="fa fa-pencil mr-1"></i> {{ _("Edit") }}
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+</div>
+
+<style>
+	.address-card {
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.address-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08) !important;
+	}
+
+	.x-small {
+		font-size: 0.75rem;
+	}
+</style>
+{% endblock %}
