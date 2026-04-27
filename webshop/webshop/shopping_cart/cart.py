@@ -275,6 +275,22 @@ def add_new_address(doc):
     doc = frappe.parse_json(doc)
     doc.update({"doctype": "Address"})
     address = frappe.get_doc(doc)
+
+    # Link the address to the current party (Customer/Lead) so it appears in cart pickers.
+    try:
+        party = get_party()
+        if party and not any(
+            (l.link_doctype == party.doctype and l.link_name == party.name)
+            for l in (address.get("links") or [])
+        ):
+            address.append("links", {
+                "link_doctype": party.doctype,
+                "link_name": party.name,
+            })
+    except Exception:
+        # Best-effort: still save the address even if party linking fails.
+        pass
+
     address.save(ignore_permissions=True)
 
     return address

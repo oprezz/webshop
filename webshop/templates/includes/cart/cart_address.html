@@ -1,30 +1,29 @@
-{% from "webshop/templates/includes/cart/cart_macros.html" import show_address %}
-
-{% if addresses | length == 1%}
-	{% set select_address = True %}
-{% endif %}
+{# Cart shipping & billing address selector. Uses a unified styled picker that lists ALL of the customer's addresses
+regardless of their address_type. #}
 
 <div class="mb-3 frappe-card p-5" data-section="shipping-address">
-	<div class="d-flex">
-		<div class="col-6 address-header"><h6>{{ _("Shipping Address") }}</h6></div>
-		<div class="col-6" style="padding: 0;">
-			<a class="ml-4 btn-new-address" role="button">{{ _("Add a new address") }}</a>
-		</div>
+	<div class="d-flex justify-content-between align-items-center mb-2">
+		<h6 class="m-0">{{ _("Shipping Address") }}</h6>
+		<a class="btn-change-address" role="button" data-address-type="shipping">{{ _("Change") }}</a>
 	</div>
-
 	<hr>
-	{% for address in shipping_addresses %}
-	{% if doc.shipping_address_name == address.name %}
-	<div class="row no-gutters" data-fieldname="shipping_address_name">
-		<div class="w-100 address-container" data-address-name="{{address.name}}" data-address-type="shipping" data-active>
-			{% include "templates/includes/cart/address_card.html" %}
+	<div class="address-container" data-address-type="shipping"
+		data-address-name="{{ doc.shipping_address_name or '' }}">
+		{% if doc.shipping_address_name %}
+		{% for address in shipping_addresses + billing_addresses %}
+		{% if address.name == doc.shipping_address_name %}
+		<div class="cart-addr-summary">
+			<div class="font-weight-bold">{{ address.title }}</div>
+			<div class="text-muted small mt-1">{{ address.display | safe }}</div>
 		</div>
+		{% endif %}
+		{% endfor %}
+		{% else %}
+		<div class="text-muted small">{{ _("No shipping address selected.") }}</div>
+		{% endif %}
 	</div>
-	{% endif %}
-	{% endfor %}
 </div>
 
-<!-- Billing Address -->
 <div class="checkbox ml-1 mb-2">
 	<label for="input_same_billing">
 		<input type="checkbox" class="product-filter" id="input_same_billing" checked style="width: 14px !important">
@@ -32,233 +31,268 @@
 	</label>
 </div>
 
-
 <div class="mb-3 frappe-card p-5" data-section="billing-address">
-	<div class="d-flex">
-		<div class="col-6 address-header"><h6>{{ _("Billing Address") }}</h6></div>
-		<div class="col-6" style="padding: 0;">
-			<a class="ml-4 btn-new-address" role="button">{{ _("Add a new address") }}</a>
-		</div>
+	<div class="d-flex justify-content-between align-items-center mb-2">
+		<h6 class="m-0">{{ _("Billing Address") }}</h6>
+		<a class="btn-change-address" role="button" data-address-type="billing">{{ _("Change") }}</a>
 	</div>
-
 	<hr>
-	{% for address in billing_addresses %}
-		{% if doc.customer_address == address.name %}
-		<div class="row no-gutters" data-fieldname="customer_address">
-			<div class="w-100 address-container" data-address-name="{{address.name}}" data-address-type="billing" data-active>
-					{% include "templates/includes/cart/address_card.html" %}
-				</div>
+	<div class="address-container" data-address-type="billing" data-address-name="{{ doc.customer_address or '' }}">
+		{% if doc.customer_address %}
+		{% for address in shipping_addresses + billing_addresses %}
+		{% if address.name == doc.customer_address %}
+		<div class="cart-addr-summary">
+			<div class="font-weight-bold">{{ address.title }}</div>
+			<div class="text-muted small mt-1">{{ address.display | safe }}</div>
 		</div>
 		{% endif %}
-	{% endfor %}
+		{% endfor %}
+		{% else %}
+		<div class="text-muted small">{{ _("No billing address selected.") }}</div>
+		{% endif %}
+	</div>
 </div>
 
-
-<script>
-frappe.ready(() => {
-	$(document).on('click', '.address-card', (e) => {
-		const $target = $(e.currentTarget);
-		const $section = $target.closest('[data-section]');
-		$section.find('.address-card').removeClass('active');
-		$target.addClass('active');
-	});
-
-	$('#input_same_billing').change((e) => {
-		const $check = $(e.target);
-		toggle_billing_address_section(!$check.is(':checked'));
-	});
-
-	$('.btn-new-address').click(() => {
-		const d = new frappe.ui.Dialog({
-			title: __('New Address'),
-			fields: [
-				{
-					label: __('Address Title'),
-					fieldname: 'address_title',
-					fieldtype: 'Data',
-					reqd: 1
-				},
-				{
-					label: __('Address Line 1'),
-					fieldname: 'address_line1',
-					fieldtype: 'Data',
-					reqd: 1
-				},
-				{
-					label: __('Address Line 2'),
-					fieldname: 'address_line2',
-					fieldtype: 'Data'
-				},
-				{
-					label: __('City/Town'),
-					fieldname: 'city',
-					fieldtype: 'Data',
-					reqd: 1
-				},
-				{
-					label: __('State'),
-					fieldname: 'state',
-					fieldtype: 'Data'
-				},
-				{
-					label: __('Country'),
-					fieldname: 'country',
-					fieldtype: 'Link',
-					options: 'Country',
-					only_select: true,
-					reqd: 1
-				},
-				{
-					fieldname: "column_break0",
-					fieldtype: "Column Break",
-					width: "50%"
-				},
-				{
-					label: __('Address Type'),
-					fieldname: 'address_type',
-					fieldtype: 'Select',
-					options: [
-						'Billing',
-						'Shipping'
-					],
-					reqd: 1
-				},
-				{
-					label: __('Postal Code'),
-					fieldname: 'pincode',
-					fieldtype: 'Data'
-				},
-				{
-					fieldname: "phone",
-					fieldtype: "Data",
-					label: "Phone",
-					reqd: 1
-				},
-			],
-			primary_action_label: __('Save'),
-			primary_action: (values) => {
-				frappe.call('webshop.webshop.shopping_cart.cart.add_new_address', { doc: values })
-					.then(r => {
-						frappe.call({
-							method: "webshop.webshop.shopping_cart.cart.update_cart_address",
-							args: {
-								address_type: r.message.address_type,
-								address_name: r.message.name
-							},
-							callback: function (r) {
-								d.hide();
-								window.location.reload();
-							}
-						});
-					});
-
-			}
-		})
-
-		d.show();
-	});
-
-	function setup_state() {
-		const shipping_address = $('[data-section="shipping-address"]')
-			.find('[data-address-name][data-active]').attr('data-address-name');
-
-		const billing_address = $('[data-section="billing-address"]')
-			.find('[data-address-name][data-active]').attr('data-address-name');
-
-		$('#input_same_billing').prop('checked', shipping_address === billing_address).trigger('change');
-
-		if (!shipping_address && !billing_address) {
-			$('#input_same_billing').prop('checked', true).trigger('change');
-		}
-
-		if (shipping_address) {
-			$(`[data-section="shipping-address"] [data-address-name="${shipping_address}"] .address-card`).addClass('active');
-		}
-		if (billing_address) {
-			$(`[data-section="billing-address"] [data-address-name="${billing_address}"] .address-card`).addClass('active');
-		}
+<style>
+	.cart-addr-list {
+		max-height: 60vh;
+		overflow-y: auto;
+		padding: 4px;
 	}
 
-	setup_state();
-
-	function toggle_billing_address_section(flag) {
-		$('[data-section="billing-address"]').toggle(flag);
+	.cart-addr-card {
+		position: relative;
+		cursor: pointer;
+		padding: 14px 16px !important;
+		margin-bottom: 10px !important;
+		border-radius: 10px !important;
+		border: 1px solid #e2e6ea !important;
+		background-color: #fff !important;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 	}
-});
-</script>
+
+	.cart-addr-card:hover {
+		border-color: #90caf9 !important;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+	}
+
+	.cart-addr-card.is-selected {
+		border: 2px solid #1976d2 !important;
+		background-color: #e8f1fb !important;
+		box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.18), 0 2px 8px rgba(25, 118, 210, 0.12) !important;
+	}
+
+	.cart-addr-card .cart-addr-title {
+		font-weight: 600;
+		color: #212529;
+		padding-right: 90px;
+		font-size: 0.95rem;
+	}
+
+	.cart-addr-card .cart-addr-display {
+		color: #6c757d;
+		font-size: 0.85rem;
+		margin-top: 4px;
+		line-height: 1.4;
+	}
+
+	.cart-addr-card .cart-addr-badge {
+		position: absolute;
+		top: 10px;
+		right: 12px;
+		color: #1976d2;
+		font-weight: 600;
+		font-size: 12px;
+		background: #fff;
+		padding: 2px 8px;
+		border-radius: 999px;
+		border: 1px solid rgba(25, 118, 210, 0.25);
+	}
+
+	.cart-addr-empty {
+		text-align: center;
+		color: #6c757d;
+		padding: 18px;
+		border: 1px dashed #dee2e6;
+		border-radius: 8px;
+		margin-bottom: 10px;
+	}
+
+	.cart-addr-summary {
+		padding: 4px 0;
+	}
+</style>
 
 <script>
 	frappe.ready(() => {
-		function get_update_address_dialog() {
-			let d = new frappe.ui.Dialog({
-				title: "Select Address",
-				fields: [{
-					'fieldtype': 'HTML',
-					'fieldname': 'address_picker',
-				}],
-				primary_action_label: __('Set Address'),
-				primary_action: () => {
-					const $card = d.$wrapper.find('.address-card.active');
-					const address_type = $card.closest('[data-address-type]').attr('data-address-type');
-					const address_name = $card.closest('[data-address-name]').attr('data-address-name');
-					frappe.call({
-						type: "POST",
-						method: "webshop.webshop.shopping_cart.cart.update_cart_address",
-						freeze: true,
-						args: {
-							address_type,
-							address_name
-						},
-						callback: function(r) {
-							d.hide();
-							if (!r.exc) {
-								$(".cart-tax-items").html(r.message.total);
-								shopping_cart.parent.find(
-									`.address-container[data-address-type="${address_type}"]`
-								).html(r.message.address);
+		// All addresses available for this party (shipping + billing types merged).
+		const all_addresses = (function () {
+			const merged = [];
+			const seen = {};
+			const lists = [
+				{{ (shipping_addresses or[]) | tojson }},
+		{{ (billing_addresses or[]) | tojson }}
+		];
+	lists.forEach(list => list.forEach(a => {
+		if (!seen[a.name]) { seen[a.name] = 1; merged.push(a); }
+	}));
+	return merged;
+	}) ();
+
+	function escape_html(str) {
+		return frappe.utils.escape_html ? frappe.utils.escape_html(str || '') : String(str || '')
+			.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+	}
+
+	function format_address_display(display) {
+		if (!display) return '';
+		let text = String(display).replace(/<br\s*\/?>(\s*)/gi, '\n');
+		text = text.replace(/<[^>]+>/g, '');
+		text = text.replace(/\n{2,}/g, '\n').replace(/^\s+|\s+$/g, '');
+		return escape_html(text).replace(/\n/g, '<br>');
+	}
+
+	let picker_state = { type: null, selected: null };
+
+	function render_cards($wrap) {
+		$wrap.empty().addClass('cart-addr-list');
+		if (!all_addresses.length) {
+			$wrap.append('<div class="cart-addr-empty">' + __('No saved addresses yet. Click "Add new address" below.') + '</div>');
+			return;
+		}
+		all_addresses.forEach(addr => {
+			const is_active = addr.name === picker_state.selected;
+			const $card = $(
+				'<div class="cart-addr-card' + (is_active ? ' is-selected' : '') + '" ' +
+				'data-address-name="' + escape_html(addr.name) + '">' +
+				(is_active ? '<div class="cart-addr-badge"><i class="fa fa-check-circle mr-1"></i>' + __('Selected') + '</div>' : '') +
+				'<div class="cart-addr-title">' + escape_html(addr.title || addr.name) + '</div>' +
+				'<div class="cart-addr-display">' + format_address_display(addr.display) + '</div>' +
+				'</div>'
+			);
+			$wrap.append($card);
+		});
+	}
+
+	function open_new_address_dialog(default_type, on_success) {
+		const nd = new frappe.ui.Dialog({
+			title: __('New Address'),
+			fields: [
+				{ label: __('Address Title'), fieldname: 'address_title', fieldtype: 'Data', reqd: 1 },
+				{
+					label: __('Address Type'), fieldname: 'address_type', fieldtype: 'Select',
+					options: ['Billing', 'Shipping', 'Office', 'Personal', 'Plant', 'Postal', 'Shop', 'Subsidiary', 'Warehouse', 'Current', 'Permanent', 'Other'].join('\n'),
+					default: default_type === 'shipping' ? 'Shipping' : 'Billing', reqd: 1
+				},
+				{ label: __('Address Line 1'), fieldname: 'address_line1', fieldtype: 'Data', reqd: 1 },
+				{ label: __('Address Line 2'), fieldname: 'address_line2', fieldtype: 'Data' },
+				{ label: __('City/Town'), fieldname: 'city', fieldtype: 'Data', reqd: 1 },
+				{ label: __('Postal Code'), fieldname: 'pincode', fieldtype: 'Data' },
+				{ fieldname: 'cb', fieldtype: 'Column Break' },
+				{ label: __('State'), fieldname: 'state', fieldtype: 'Data' },
+				{ label: __('Country'), fieldname: 'country', fieldtype: 'Link', options: 'Country', only_select: true, reqd: 1 },
+				{ label: __('Phone'), fieldname: 'phone', fieldtype: 'Data', reqd: 1 }
+			],
+			primary_action_label: __('Save Address'),
+			primary_action: (values) => {
+				frappe.call({
+					method: 'webshop.webshop.shopping_cart.cart.add_new_address',
+					args: { doc: values },
+					freeze: true,
+					callback: (r) => {
+						if (r.message) {
+							nd.hide();
+							on_success(r.message);
+						}
+					}
+				});
+			}
+		});
+		nd.show();
+	}
+
+	function open_picker(type) {
+		picker_state.type = type;
+		const current = $(`[data-section="${type}-address"] .address-container`).attr('data-address-name');
+		picker_state.selected = current || (all_addresses[0] && all_addresses[0].name) || null;
+
+		const d = new frappe.ui.Dialog({
+			title: type === 'shipping' ? __('Select Shipping Address') : __('Select Billing Address'),
+			size: 'small',
+			fields: [
+				{ fieldtype: 'HTML', fieldname: 'address_list' },
+				{ fieldtype: 'Button', fieldname: 'add_new', label: __('Add new address') }
+			],
+			primary_action_label: __('Use Selected'),
+			primary_action: () => {
+				if (!picker_state.selected) {
+					frappe.msgprint(__('Please select an address.'));
+					return;
+				}
+				frappe.call({
+					type: 'POST',
+					method: 'webshop.webshop.shopping_cart.cart.update_cart_address',
+					freeze: true,
+					args: { address_type: type, address_name: picker_state.selected },
+					callback: (r) => {
+						d.hide();
+						if (!r.exc) {
+							// Replace inline summary with newly selected address details.
+							const addr = all_addresses.find(a => a.name === picker_state.selected);
+							const $container = $(`[data-section="${type}-address"] .address-container`);
+							$container.attr('data-address-name', picker_state.selected);
+							if (addr) {
+								$container.html(
+									'<div class="cart-addr-summary">' +
+									'<div class="font-weight-bold">' + escape_html(addr.title || addr.name) + '</div>' +
+									'<div class="text-muted small mt-1">' + format_address_display(addr.display) + '</div>' +
+									'</div>'
+								);
+							}
+							if (r.message && r.message.total) {
+								$('.cart-tax-items').html(r.message.total);
 							}
 						}
-					});
-				}
-			});
-
-			return d;
-		}
-
-		function get_address_template(type) {
-			return {
-				shipping: `<div class="mb-3" data-section="shipping-address">
-					<div class="row no-gutters" data-fieldname="shipping_address_name">
-						{% for address in shipping_addresses %}
-							<div class="mr-3 mb-3 w-100" data-address-name="{{address.name}}" data-address-type="shipping"
-								{% if doc.shipping_address_name == address.name %} data-active {% endif %}>
-								{% include "templates/includes/cart/address_picker_card.html" %}
-							</div>
-						{% endfor %}
-					</div>
-				</div>`,
-				billing: `<div class="mb-3" data-section="billing-address">
-					<div class="row no-gutters" data-fieldname="customer_address">
-						{% for address in billing_addresses %}
-							<div class="mr-3 mb-3 w-100" data-address-name="{{address.name}}" data-address-type="billing"
-								{% if doc.shipping_address_name == address.name %} data-active {% endif %}>
-								{% include "templates/includes/cart/address_picker_card.html" %}
-							</div>
-						{% endfor %}
-					</div>
-				</div>`,
-			}[type];
-		}
-
-		$(document).on('click', '.btn-change-address', (e) => {
-			const d = get_update_address_dialog();
-			const type = $(e.currentTarget).parents('.address-container').attr('data-address-type');
-
-			$(d.get_field('address_picker').wrapper).html(
-				get_address_template(type)
-			);
-
-			d.show();
+					}
+				});
+			}
 		});
+
+		const $wrap = $(d.get_field('address_list').wrapper);
+		render_cards($wrap);
+
+		$wrap.on('click', '.cart-addr-card', function () {
+			picker_state.selected = $(this).attr('data-address-name');
+			render_cards($wrap);
+		});
+
+		d.get_field('add_new').$input.on('click', () => {
+			open_new_address_dialog(type, () => {
+				// Reload so the server-rendered list reflects the new linked address.
+				window.location.reload();
+			});
+		});
+
+		d.show();
+	}
+
+	$(document).on('click', '.btn-change-address', function (e) {
+		e.preventDefault();
+		open_picker($(this).attr('data-address-type'));
 	});
+
+	function setup_state() {
+		const shipping = $('[data-section="shipping-address"] .address-container').attr('data-address-name');
+		const billing = $('[data-section="billing-address"] .address-container').attr('data-address-name');
+		const same = shipping && billing && shipping === billing;
+		$('#input_same_billing').prop('checked', !!same || (!shipping && !billing)).trigger('change');
+	}
+
+	$('#input_same_billing').change(function () {
+		$('[data-section="billing-address"]').toggle(!$(this).is(':checked'));
+	});
+
+	setup_state();
+});
 </script>
