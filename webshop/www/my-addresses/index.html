@@ -61,11 +61,21 @@
 						</span>
 					</div>
 
-					<div class="action-buttons pt-3 border-top">
+					<div class="action-buttons pt-3 border-top d-flex">
 						<a href="/address/{{ addr.name }}?success_url=/my-addresses"
-							class="btn btn-block btn-outline-secondary btn-sm">
-							<i class="fa fa-pencil mr-1"></i> {{ _("Edit") }}
+							class="btn btn-outline-secondary btn-sm flex-grow-1 mr-2">
+							<svg class="icon icon-sm">
+								<use href="#icon-edit"></use>
+							</svg>
+							{{ _("Edit") }}
 						</a>
+						<button type="button" class="btn btn-outline-danger btn-sm btn-delete-address"
+							data-address-name="{{ addr.name }}" data-address-title="{{ addr.address_title }}"
+							title="{{ _('Delete address') }}">
+							<svg class="icon icon-sm">
+								<use href="#icon-delete"></use>
+							</svg>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -89,4 +99,34 @@
 		font-size: 0.75rem;
 	}
 </style>
+{% endblock %}
+
+{% block script %}
+<script>
+	frappe.ready(function () {
+		$(document).on('click', '.btn-delete-address', function () {
+			var $btn = $(this);
+			var name = $btn.data('address-name');
+			var title = $btn.data('address-title') || name;
+
+			frappe.confirm(
+				__('Are you sure you want to delete the address "{0}"? This cannot be undone.', [title]),
+				function () {
+					frappe.call({
+						method: 'webshop.webshop.delete_my_address',
+						args: { address_name: name },
+						freeze: true,
+						freeze_message: __('Deleting address...'),
+						callback: function (r) {
+							if (r.message && r.message.ok) {
+								frappe.show_alert({ message: __('Address deleted'), indicator: 'green' });
+								$btn.closest('.col-12').fadeOut(200, function () { $(this).remove(); });
+							}
+						}
+					});
+				}
+			);
+		});
+	});
+</script>
 {% endblock %}

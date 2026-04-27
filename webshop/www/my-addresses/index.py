@@ -10,6 +10,56 @@ def get_context(context):
 	context.add_address_route = "/address/new?success_url=/my-addresses"
 
 
+def _user_address_names():
+	"""Return the set of address names the current user is allowed to manage."""
+	user = frappe.session.user
+	contact_name = frappe.db.get_value("Contact", {"email_id": user})
+
+	parent_names = []
+	if contact_name:
+		links = frappe.get_all(
+			"Dynamic Link",
+			filters={"parent": contact_name, "link_doctype": ["in", ["Customer", "Supplier"]]},
+			fields=["link_name"],
+		)
+		parent_names = [l.link_name for l in links]
+
+	names = set()
+	if parent_names:
+		linked = frappe.db.sql(
+			"""
+			SELECT DISTINCT parent
+			FROM `tabDynamic Link`
+			WHERE link_doctype IN ('Customer', 'Supplier')
+			AND link_name IN %(names)s
+			AND parenttype = 'Address'
+			""",
+			{"names": tuple(parent_names)},
+			as_dict=1,
+		)
+		names.update(a.parent for a in linked)
+
+	owned = frappe.get_all("Address", filters={"owner": user}, pluck="name")
+	names.update(owned)
+	return names
+
+
+def delete_address(address_name):
+	"""Delete an Address that belongs to the current user (called via shim)."""
+	if frappe.session.user == "Guest":
+		frappe.throw(_("You need to be logged in"), frappe.PermissionError)
+
+	if not address_name:
+		frappe.throw(_("Address is required"))
+
+	allowed = _user_address_names()
+	if address_name not in allowed:
+		frappe.throw(_("You are not allowed to delete this address"), frappe.PermissionError)
+
+	frappe.delete_doc("Address", address_name, ignore_permissions=True)
+	return {"ok": True}
+
+
 def get_user_addresses():
 	"""Fetch addresses linked to the current user via Contact/Customer or direct ownership."""
 	user = frappe.session.user
