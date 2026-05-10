@@ -112,6 +112,21 @@
 							<input type="date" id="btn_custom_delivery_date" class="form-control hasDatepicker"
 								value="{{ doc.custom_delivery_date }}">
 						</div>
+						<div class="mt-3">
+							<div class="clearfix">
+								<label class="control-label" style="padding-right: 0px;">{{ _("Delivery Window")
+									}}</label>
+							</div>
+							<div class="control-input">
+								<select id="select_delivery_window" class="form-control">
+									<option value="">{{ _("Not specified") }}</option>
+									<option value="Morning (AM)" {% if doc.custom_delivery_window=="Morning (AM)"
+										%}selected{% endif %}>{{ _("Morning (AM)") }}</option>
+									<option value="Afternoon (PM)" {% if doc.custom_delivery_window=="Afternoon (PM)"
+										%}selected{% endif %}>{{ _("Afternoon (PM)") }}</option>
+								</select>
+							</div>
+						</div>
 					</div>
 					{% include "templates/includes/cart/cart_address.html" %}
 				</div>

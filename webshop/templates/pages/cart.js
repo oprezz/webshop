@@ -19,6 +19,7 @@ $.extend(shopping_cart, {
 		shopping_cart.bind_change_notes();
 		shopping_cart.bind_coupon_code();
 		shopping_cart.bind_custom_delivery_date();
+		shopping_cart.bind_delivery_window();
 	},
 
 	bind_custom_delivery_date: function () {
@@ -26,6 +27,17 @@ $.extend(shopping_cart, {
 			var delivery_date = this.value
 			shopping_cart.set_delivery_date(this, delivery_date);
 		})
+	},
+
+	bind_delivery_window: function () {
+		$("#select_delivery_window").on("change", function () {
+			var delivery_window = this.value;
+			frappe.call({
+				type: "POST",
+				method: "webshop.webshop.shopping_cart.cart.set_delivery_window",
+				args: { delivery_window: delivery_window },
+			});
+		});
 	},
 
 	bind_place_order: function () {

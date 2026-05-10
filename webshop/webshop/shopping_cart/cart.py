@@ -165,6 +165,7 @@ def place_order():
                     )
 
     sales_order.delivery_date = quotation.custom_delivery_date
+    sales_order.custom_delivery_window = quotation.custom_delivery_window or ''
     sales_order.flags.ignore_permissions = True
     sales_order.insert()
     sales_order.submit()
@@ -180,6 +181,15 @@ def set_delivery_date(delivery_date):
     quotation = _get_cart_quotation()
     quotation.flags.ignore_permissions = True
     quotation.custom_delivery_date = delivery_date
+    quotation.save()
+    return
+
+
+@frappe.whitelist()
+def set_delivery_window(delivery_window):
+    quotation = _get_cart_quotation()
+    quotation.flags.ignore_permissions = True
+    quotation.custom_delivery_window = delivery_window or ''
     quotation.save()
     return
 
