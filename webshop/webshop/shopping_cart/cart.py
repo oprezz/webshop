@@ -68,7 +68,7 @@ def get_shipping_addresses(party=None):
             "display": address.display,
         }
         for address in addresses
-        if address.address_type == "Shipping"
+        if address.is_shipping_address or address.address_type == "Shipping"
     ]
 
 
@@ -84,7 +84,7 @@ def get_billing_addresses(party=None):
             "display": address.display,
         }
         for address in addresses
-        if address.address_type == "Billing"
+        if address.is_primary_address or address.address_type == "Billing"
     ]
 
 
@@ -747,9 +747,15 @@ def get_address_docs(
     )
 
     out = []
+    seen = set()
 
     for a in address_names:
+        if a.parent in seen:
+            continue
+        seen.add(a.parent)
         address = frappe.get_doc("Address", a.parent)
+        if address.disabled:
+            continue
         address.display = get_address_display(address.as_dict())
         out.append(address)
 

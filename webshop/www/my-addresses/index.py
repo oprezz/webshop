@@ -12,36 +12,26 @@ def get_context(context):
 
 def _user_address_names():
 	"""Return the set of address names the current user is allowed to manage."""
-	user = frappe.session.user
-	contact_name = frappe.db.get_value("Contact", {"email_id": user})
+	from webshop.webshop.shopping_cart.cart import get_party
 
-	parent_names = []
-	if contact_name:
-		links = frappe.get_all(
-			"Dynamic Link",
-			filters={"parent": contact_name, "link_doctype": ["in", ["Customer", "Supplier"]]},
-			fields=["link_name"],
-		)
-		parent_names = [l.link_name for l in links]
+	try:
+		party = get_party()
+	except Exception:
+		party = None
 
-	names = set()
-	if parent_names:
-		linked = frappe.db.sql(
-			"""
-			SELECT DISTINCT parent
-			FROM `tabDynamic Link`
-			WHERE link_doctype IN ('Customer', 'Supplier')
-			AND link_name IN %(names)s
-			AND parenttype = 'Address'
-			""",
-			{"names": tuple(parent_names)},
-			as_dict=1,
-		)
-		names.update(a.parent for a in linked)
+	if not party:
+		return set()
 
-	owned = frappe.get_all("Address", filters={"owner": user}, pluck="name")
-	names.update(owned)
-	return names
+	rows = frappe.db.get_all(
+		"Dynamic Link",
+		fields=["parent"],
+		filters={
+			"parenttype": "Address",
+			"link_doctype": party.doctype,
+			"link_name": party.name,
+		},
+	)
+	return {r.parent for r in rows}
 
 
 def delete_address(address_name):
@@ -61,52 +51,44 @@ def delete_address(address_name):
 
 
 def get_user_addresses():
-	"""Fetch addresses linked to the current user via Contact/Customer or direct ownership."""
-	user = frappe.session.user
-	
-	# 1. Get Contact linked to User
-	contact_name = frappe.db.get_value("Contact", {"email_id": user})
-	
-	parent_names = []
-	if contact_name:
-		# Get links (Customer, Supplier) from Contact
-		links = frappe.get_all("Dynamic Link", 
-			filters={"parent": contact_name, "link_doctype": ["in", ["Customer", "Supplier"]]},
-			fields=["link_doctype", "link_name"]
-		)
-		parent_names = [l.link_name for l in links]
+	"""Fetch addresses linked to the current user's party (Customer/Supplier).
 
-	address_names = []
-	
-	# 2. If we found linked parents (e.g. User -> Contact -> Customer A)
-	if parent_names:
-		# Find addresses linked to these parents
-		linked_addresses = frappe.db.sql("""
-			SELECT DISTINCT parent 
-			FROM `tabDynamic Link`
-			WHERE link_doctype IN ('Customer', 'Supplier') 
-			AND link_name IN %(names)s
-			AND parenttype = 'Address'
-		""", {"names": tuple(parent_names)}, as_dict=1)
-		
-		address_names = [a.parent for a in linked_addresses]
-	
-	# 3. Fetch full address details
-	filters = {"disabled": 0}
-	
-	if address_names:
-		# If user has corporate links, show those addresses
-		filters["name"] = ["in", address_names]
-		# Optionally also include personal addresses (owner=user) via OR condition?
-		# For now, let's trust the links first. If no links, fallback to owner.
-	else:
-		# Fallback: simple ownership check
-		filters["owner"] = user
+	Uses the same resolution as the cart and weekly-order pages so that every
+	portal surface shows exactly the same set of addresses.
+	"""
+	from webshop.webshop.shopping_cart.cart import get_party
 
-	addresses = frappe.get_all("Address", 
-		filters=filters,
-		fields=["name", "address_title", "address_type", "address_line1", "city", "state", "country", "pincode", "is_primary_address", "is_shipping_address", "phone"],
-		order_by="is_primary_address desc, creation desc"
+	try:
+		party = get_party()
+	except Exception:
+		party = None
+
+	if not party:
+		return []
+
+	address_names = frappe.db.get_all(
+		"Dynamic Link",
+		fields=["parent"],
+		filters={
+			"parenttype": "Address",
+			"link_doctype": party.doctype,
+			"link_name": party.name,
+		},
 	)
-	
-	return addresses
+
+	out = []
+	seen = set()
+	for row in address_names:
+		if row.parent in seen:
+			continue
+		seen.add(row.parent)
+		try:
+			address = frappe.get_doc("Address", row.parent)
+		except frappe.DoesNotExistError:
+			continue
+		if address.disabled:
+			continue
+		out.append(address)
+
+	out.sort(key=lambda a: (-a.is_primary_address, a.creation), reverse=False)
+	return out
