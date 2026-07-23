@@ -88,40 +88,33 @@ class ProductQuery:
 
         result = self.filter_results_by_discount(fields, result)
 
+        # Hide items without a resolvable price for this visitor (per-partner
+        # price lists), THEN paginate — pages stay full and unpriced items no
+        # longer consume page slots. items_count keeps its "remaining rows
+        # from this offset" meaning that drives the storefront Next button.
+        result = [item for item in result if "price_list_rate" in item]
+        count = max(0, len(result) - start)
+        result = result[start : start + self.page_length]
+
         return {"items": result, "items_count": count, "discounts": discounts}
 
     def query_items(self, start=0):
-        """Build a query to fetch Website Items based on field filters."""
-        # MySQL does not support offset without limit,
-        # frappe does not accept two parameters for limit
-        # https://dev.mysql.com/doc/refman/8.0/en/select.html#id4651989
-        count_items = frappe.db.get_all(
-            "Website Item",
-            filters=self.filters,
-            or_filters=self.or_filters,
-            limit_page_length=184467440737095516,
-            limit_start=start,  # get all items from this offset for total count ahead
-            order_by="ranking desc",
-        )
-        count = len(count_items)
+        """Build a query to fetch Website Items based on field filters.
 
-        # If discounts included, return all rows.
-        # Slice after filtering rows with discount (See `filter_results_by_discount`).
-        # Slicing before hand will miss discounted items on the 3rd or 4th page.
-        # Discounts are fetched on computing Pricing Rules so we cannot query them directly.
-        page_length = 184467440737095516 if self.filter_with_discount else self.page_length
-
+        Returns ALL matching rows: pagination happens at the end of `query`,
+        after price/discount filtering, so pages stay full and the count
+        reflects items the customer can actually see and buy.
+        """
         items = frappe.db.get_all(
             "Website Item",
             fields=self.fields,
             filters=self.filters,
             or_filters=self.or_filters,
-            limit_page_length=page_length,
-            limit_start=start,
+            limit_page_length=184467440737095516,
             order_by="ranking desc",
         )
 
-        return items, count
+        return items, len(items)
 
     def query_items_with_attributes(self, attributes, start=0):
         """Build a query to fetch Website Items based on field & attribute filters."""
@@ -330,9 +323,6 @@ class ProductQuery:
                 if row.get("discount_percent") and row.discount_percent <= discount_percent
             ]
 
-        if self.filter_with_discount:
-            # no limit was added to results while querying
-            # slice results manually
-            result[: self.page_length]
+        # Slicing to page_length happens centrally at the end of `query`.
 
         return result
