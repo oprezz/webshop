@@ -110,7 +110,7 @@
 						</div>
 						<div class="control-input">
 							<input type="date" id="btn_custom_delivery_date" class="form-control hasDatepicker"
-								value="{{ doc.custom_delivery_date }}">
+								value="{{ doc.custom_delivery_date or '' }}">
 						</div>
 						<div class="mt-3">
 							<div class="clearfix">
@@ -155,8 +155,7 @@
 		{% endblock %}
 
 		{% block base_scripts %}
-		<!-- js should be loaded in body! -->
-		{{ include_script("frappe-web.bundle.js") }}
+		{{ super() }} {#- keeps the frappe.boot injection + frappe-web.bundle from base.html -#}
 		{{ include_script("controls.bundle.js") }}
 		{{ include_script("dialog.bundle.js") }}
 		{% endblock %}
