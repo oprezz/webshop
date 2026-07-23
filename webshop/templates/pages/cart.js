@@ -56,8 +56,34 @@ $.extend(shopping_cart, {
 		// bind update button
 		$(".cart-items").on("change", ".cart-qty", function () {
 			var item_code = $(this).attr("data-item-code");
+			var item_feature = $(this).attr("data-feature") || "";
 			var newVal = $(this).val();
-			shopping_cart.shopping_cart_update({ item_code, qty: newVal });
+			shopping_cart.shopping_cart_update({ item_code, qty: newVal, item_feature });
+		});
+
+		$(".cart-items").on("change", ".cart-item-feature", function () {
+			var $select = $(this);
+			$select.prop("disabled", true);
+			frappe.call({
+				type: "POST",
+				method: "webshop.webshop.shopping_cart.cart.set_cart_item_feature",
+				args: {
+					item_row_name: $select.attr("data-name"),
+					item_feature: $select.val() || ""
+				},
+				callback: function (r) {
+					$select.prop("disabled", false);
+					if (!r.exc && r.message) {
+						$(".cart-items").html(r.message.items);
+						$(".cart-tax-items").html(r.message.total);
+						$(".payment-summary").html(r.message.taxes_and_totals);
+						shopping_cart.set_cart_count();
+					}
+				},
+				error: function () {
+					$select.prop("disabled", false);
+				}
+			});
 		});
 
 		$(".cart-items").on('click', '.number-spinner button', function () {
@@ -77,9 +103,11 @@ $.extend(shopping_cart, {
 
 			let notes = input.closest("td").siblings().find(".notes").text().trim();
 			var item_code = input.attr("data-item-code");
+			var item_feature = input.attr("data-feature") || "";
 			shopping_cart.shopping_cart_update({
 				item_code,
 				qty: newVal,
+				item_feature,
 				additional_notes: notes
 			});
 		});
@@ -89,12 +117,14 @@ $.extend(shopping_cart, {
 		$('.cart-items').on('change', 'textarea', function () {
 			const $textarea = $(this);
 			const item_code = $textarea.attr('data-item-code');
-			const qty = $textarea.closest('tr').find('.cart-qty').val();
-			const notes = $textarea.val();
+			const $qty_input = $textarea.closest('tr').find('.cart-qty');
+			const qty = $qty_input.val();
+			const item_feature = $qty_input.attr('data-feature') || '';
 			shopping_cart.shopping_cart_update({
 				item_code,
 				qty,
-				additional_notes: notes
+				item_feature,
+				additional_notes: $textarea.val()
 			});
 		});
 	},
@@ -103,10 +133,12 @@ $.extend(shopping_cart, {
 		$(".cart-items").on("click", ".remove-cart-item", (e) => {
 			const $remove_cart_item_btn = $(e.currentTarget);
 			var item_code = $remove_cart_item_btn.data("item-code");
+			var item_feature = $remove_cart_item_btn.attr("data-feature") || "";
 
 			shopping_cart.shopping_cart_update({
 				item_code: item_code,
-				qty: 0
+				qty: 0,
+				item_feature
 			});
 		});
 	},

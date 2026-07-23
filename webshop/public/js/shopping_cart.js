@@ -90,6 +90,7 @@ $.extend(shopping_cart, {
 				args: {
 					item_code: opts.item_code,
 					qty: opts.qty,
+					item_feature: opts.item_feature !== undefined ? opts.item_feature : undefined,
 					additional_notes: opts.additional_notes !== undefined ? opts.additional_notes : undefined,
 					with_items: opts.with_items || 0
 				},
@@ -151,10 +152,11 @@ $.extend(shopping_cart, {
 		}
 	},
 
-	shopping_cart_update: function ({ item_code, qty, cart_dropdown, additional_notes }) {
+	shopping_cart_update: function ({ item_code, qty, cart_dropdown, additional_notes, item_feature }) {
 		shopping_cart.update_cart({
 			item_code,
 			qty,
+			item_feature,
 			additional_notes,
 			with_items: 1,
 			btn: this,
@@ -212,14 +214,24 @@ $.extend(shopping_cart, {
 
 			// Custom: Read quantity from nearby input
 			let qty = 1;
-			const $qtyInput = $btn.closest('.quantity-add-container').find('.item-qty');
+			const $container = $btn.closest('.quantity-add-container');
+			const $qtyInput = $container.find('.item-qty');
 			if ($qtyInput.length) {
 				qty = parseFloat($qtyInput.val()) || 1;
 			}
 
+			// Custom: Read selected Item Feature (inside the container in list
+			// view, a sibling of it in grid view)
+			let $featureSelect = $container.find('.item-feature-select');
+			if (!$featureSelect.length) {
+				$featureSelect = $container.parent().find('.item-feature-select');
+			}
+			const item_feature = $featureSelect.val() || '';
+
 			webshop.webshop.shopping_cart.update_cart({
 				item_code,
-				qty: qty
+				qty: qty,
+				item_feature
 			});
 
 		});

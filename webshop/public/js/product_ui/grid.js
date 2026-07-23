@@ -195,8 +195,10 @@ webshop.ProductGrid = class {
 		} else if (settings.enabled && (settings.allow_items_not_in_stock || item.in_stock)) {
 			const btnClass = item.in_cart ? 'hidden' : '';
 			const inCartBtnClass = item.in_cart ? '' : 'hidden';
+			const featureSelect = webshop.get_item_feature_select(item, true);
 
 			return `
+				${featureSelect}
 				<div class="d-flex align-items-center mt-2 w-100 quantity-add-container">
 					<div class="input-group input-group-sm mr-2" style="width: 50px; flex: 0 0 50px;">
 						 <input type="number" class="form-control item-qty" value="1" min="1" step="1" 

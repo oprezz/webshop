@@ -207,15 +207,38 @@ def request_for_quotation():
     return quotation.name
 
 
+def _clean_item_feature(item_code, item_feature):
+    """Validate a requested Item Feature (kenyerhaz custom doctype) for an item.
+
+    Returns the sanitized feature name ("" when none given). Throws when the
+    feature does not exist, is disabled, or belongs to a different feature
+    group than the item's.
+    """
+    feature = (item_feature or "").strip()
+    if not feature or not frappe.db.exists("DocType", "Item Feature"):
+        return ""
+
+    group = frappe.db.get_value("Item", item_code, "custom_item_feature_group")
+    meta = frappe.db.get_value(
+        "Item Feature", feature, ["feature_group", "disabled"], as_dict=True
+    )
+    if not meta or meta.disabled or not group or meta.feature_group != group:
+        throw(_("Invalid feature '{0}' for item {1}.").format(feature, item_code))
+    return feature
+
+
 @frappe.whitelist()
-def update_cart(item_code, qty, additional_notes=None, with_items=False):
+def update_cart(item_code, qty, additional_notes=None, with_items=False, item_feature=None):
     quotation = _get_cart_quotation()
+    item_feature = _clean_item_feature(item_code, item_feature)
+
+    def row_matches(d):
+        return d.item_code == item_code and (d.custom_item_feature or "") == item_feature
 
     empty_card = False
     qty = flt(qty)
     if qty == 0:
-        quotation_items = quotation.get(
-            "items", {"item_code": ["!=", item_code]})
+        quotation_items = [d for d in quotation.get("items") if not row_matches(d)]
         if quotation_items:
             quotation.set("items", quotation_items)
         else:
@@ -226,7 +249,7 @@ def update_cart(item_code, qty, additional_notes=None, with_items=False):
             "Website Item", {"item_code": item_code}, "website_warehouse"
         )
 
-        quotation_items = quotation.get("items", {"item_code": item_code})
+        quotation_items = [d for d in quotation.get("items") if row_matches(d)]
         if not quotation_items:
             quotation.append(
                 "items",
@@ -234,6 +257,7 @@ def update_cart(item_code, qty, additional_notes=None, with_items=False):
                     "doctype": "Quotation Item",
                     "item_code": item_code,
                     "qty": qty,
+                    "custom_item_feature": item_feature or None,
                     "additional_notes": additional_notes,
                     "warehouse": warehouse,
                 },
@@ -270,6 +294,57 @@ def update_cart(item_code, qty, additional_notes=None, with_items=False):
         }
     else:
         return {"name": quotation.name}
+
+
+@frappe.whitelist()
+def set_cart_item_feature(item_row_name, item_feature=None):
+    """Change the Item Feature of one cart row.
+
+    If another row already holds the same item with the target feature, the
+    quantities are merged into that row. Returns re-rendered cart fragments
+    (same shape as update_cart with_items=1).
+    """
+    quotation = _get_cart_quotation()
+
+    row = next((d for d in quotation.get("items") if d.name == item_row_name), None)
+    if not row:
+        throw(_("Cart item not found."))
+
+    feature = _clean_item_feature(row.item_code, item_feature)
+
+    twin = next(
+        (
+            d for d in quotation.get("items")
+            if d.name != row.name
+            and d.item_code == row.item_code
+            and (d.custom_item_feature or "") == feature
+        ),
+        None,
+    )
+    if twin:
+        twin.qty = flt(twin.qty) + flt(row.qty)
+        quotation.set("items", [d for d in quotation.get("items") if d.name != row.name])
+    else:
+        row.custom_item_feature = feature or None
+
+    apply_cart_settings(quotation=quotation)
+    quotation.flags.ignore_permissions = True
+    quotation.payment_schedule = []
+    quotation.save()
+    set_cart_count(quotation)
+
+    context = get_cart_quotation(quotation)
+    return {
+        "items": frappe.render_template(
+            "templates/includes/cart/cart_items.html", context
+        ),
+        "total": frappe.render_template(
+            "templates/includes/cart/cart_items_total.html", context
+        ),
+        "taxes_and_totals": frappe.render_template(
+            "templates/includes/cart/cart_payment_summary.html", context
+        ),
+    }
 
 
 @frappe.whitelist()

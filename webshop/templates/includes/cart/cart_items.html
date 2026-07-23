@@ -49,6 +49,27 @@
 				</span>
 				{% endif %}
 
+				{%- set feature_group = frappe.db.get_value('Item', d.item_code, 'custom_item_feature_group') %}
+				{% if feature_group and not d.is_free_item %}
+				{%- set require_feature = frappe.db.get_value('Item', d.item_code, 'custom_require_item_feature') %}
+				{%- set item_features = frappe.get_all('Item Feature',
+					filters={'feature_group': feature_group, 'disabled': 0},
+					fields=['name', 'short_name', 'icon'], order_by='sort_order asc') %}
+				<div class="mt-1">
+					<select class="form-control form-control-sm cart-item-feature"
+						style="max-width: 200px; font-size: 0.85rem;" data-name="{{ d.name }}">
+						{% if not require_feature %}
+						<option value="">{{ _("Plain") }}</option>
+						{% endif %}
+						{% for f in item_features %}
+						<option value="{{ f.name }}" {% if (d.custom_item_feature or '') == f.name %}selected{% endif %}>
+							{{ f.icon }} {{ f.short_name }}
+						</option>
+						{% endfor %}
+					</select>
+				</div>
+				{% endif %}
+
 				<!-- <div class="mt-2 notes">
 							<textarea data-item-code="{{d.item_code}}" class="form-control" rows="2" placeholder="{{ _('Add notes') }}">{{d.additional_notes or ''}}</textarea>
 						</div> -->
@@ -68,7 +89,8 @@
 				</span>
 
 				<input class="form-control text-center cart-qty" value="{{ d.get_formatted('qty') }}"
-					data-item-code="{{ d.item_code }}" style="max-width: 70px;" {{ disabled }}>
+					data-item-code="{{ d.item_code }}" data-feature="{{ d.custom_item_feature or '' }}"
+					style="max-width: 70px;" {{ disabled }}>
 
 				<span class="input-group-append d-sm-inline-block">
 					<button class="btn cart-btn" data-dir="up" {{ disabled }}>
@@ -79,7 +101,8 @@
 
 			<div>
 				{% if not d.is_free_item %}
-				<div class="remove-cart-item column-sm-view d-flex" data-item-code="{{ d.item_code }}">
+				<div class="remove-cart-item column-sm-view d-flex" data-item-code="{{ d.item_code }}"
+					data-feature="{{ d.custom_item_feature or '' }}">
 					<span>
 						<svg class="icon sm remove-cart-item-logo" width="18" height="18" viewBox="0 0 18 18"
 							xmlns="http://www.w3.org/2000/svg" id="icon-close">

@@ -198,11 +198,13 @@ webshop.ProductList = class {
 		} else if (settings.enabled && (settings.allow_items_not_in_stock || item.in_stock)) {
 			const btnClass = item.in_cart ? 'hidden' : '';
 			const inCartBtnClass = item.in_cart ? '' : 'hidden';
+			const featureSelect = webshop.get_item_feature_select(item);
 
 			return `
 				<div class="d-flex justify-content-end align-items-center quantity-add-container mt-2 mt-md-0">
+					${featureSelect}
 					<div class="input-group input-group-sm mr-2" style="width: 60px;">
-						 <input type="number" class="form-control item-qty" value="1" min="1" step="1" 
+						 <input type="number" class="form-control item-qty" value="1" min="1" step="1"
 						 	style="height: 30px; text-align: center;"
 						 	data-item-code="${item.item_code}">
 					</div>

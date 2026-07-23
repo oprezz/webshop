@@ -12,13 +12,6 @@ from webshop.webshop.product_data_engine.query import ProductQuery
 from webshop.webshop.doctype.override_doctype.item_group import get_child_groups_for_website
 
 
-def filter_items_with_price(items):
-    """
-    Filter out items which do not have price
-    """
-    return [item for item in items if "price_list_rate" in item]
-
-
 @frappe.whitelist(allow_guest=True)
 def get_product_filter_data(query_args=None):
     """
@@ -83,8 +76,8 @@ def get_product_filter_data(query_args=None):
         filter_engine = ProductFiltersBuilder()
         filters["discount_filters"] = filter_engine.get_discount_filters(discounts)
 
-	# filter out items which do not have price
-    result["items"] = filter_items_with_price(result["items"])
+    # Unpriced items are filtered inside ProductQuery.query, before pagination.
+    attach_item_features(result["items"])
 
     return {
         "items": result["items"] or [],
@@ -93,6 +86,47 @@ def get_product_filter_data(query_args=None):
         "sub_categories": sub_categories,
         "items_count": result["items_count"],
     }
+
+
+def attach_item_features(items):
+    """Attach selectable Item Feature options (kenyerhaz custom doctype) to
+    product cards so the storefront can offer a feature picker per item."""
+    if not items or not frappe.db.exists("DocType", "Item Feature"):
+        return
+
+    codes = [i.get("item_code") for i in items if i.get("item_code")]
+    if not codes:
+        return
+
+    flagged = {
+        r.name: r
+        for r in frappe.get_all(
+            "Item",
+            filters={"name": ["in", codes]},
+            fields=["name", "custom_item_feature_group", "custom_require_item_feature"],
+        )
+        if r.custom_item_feature_group
+    }
+    if not flagged:
+        return
+
+    groups = list({r.custom_item_feature_group for r in flagged.values()})
+    by_group = {}
+    for f in frappe.get_all(
+        "Item Feature",
+        filters={"disabled": 0, "feature_group": ["in", groups]},
+        fields=["name", "short_name", "icon", "feature_group"],
+        order_by="sort_order asc, short_name asc",
+    ):
+        by_group.setdefault(f.feature_group, []).append(
+            {"name": f.name, "short_name": f.short_name, "icon": f.icon or ""}
+        )
+
+    for item in items:
+        flag = flagged.get(item.get("item_code"))
+        if flag:
+            item["features"] = by_group.get(flag.custom_item_feature_group, [])
+            item["require_item_feature"] = cint(flag.custom_require_item_feature)
 
 
 @frappe.whitelist(allow_guest=True)
