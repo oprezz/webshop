@@ -89,8 +89,9 @@ def get_product_filter_data(query_args=None):
 
 
 def attach_item_features(items):
-    """Attach selectable Item Feature options (kenyerhaz custom doctype) to
-    product cards so the storefront can offer a feature picker per item."""
+    """Attach selectable Item Feature options and the frozen-shipping flag
+    (kenyerhaz custom fields) to product cards so the storefront can offer a
+    feature picker and a ❄ frozen choice per item."""
     if not items or not frappe.db.exists("DocType", "Item Feature"):
         return
 
@@ -98,35 +99,41 @@ def attach_item_features(items):
     if not codes:
         return
 
-    flagged = {
+    meta_rows = {
         r.name: r
         for r in frappe.get_all(
             "Item",
             filters={"name": ["in", codes]},
-            fields=["name", "custom_item_feature_group", "custom_require_item_feature"],
+            fields=[
+                "name", "custom_item_feature_group",
+                "custom_require_item_feature", "custom_can_ship_frozen",
+            ],
         )
-        if r.custom_item_feature_group
     }
-    if not flagged:
-        return
 
-    groups = list({r.custom_item_feature_group for r in flagged.values()})
+    groups = list({
+        r.custom_item_feature_group for r in meta_rows.values() if r.custom_item_feature_group
+    })
     by_group = {}
-    for f in frappe.get_all(
-        "Item Feature",
-        filters={"disabled": 0, "feature_group": ["in", groups]},
-        fields=["name", "short_name", "icon", "feature_group"],
-        order_by="sort_order asc, short_name asc",
-    ):
-        by_group.setdefault(f.feature_group, []).append(
-            {"name": f.name, "short_name": f.short_name, "icon": f.icon or ""}
-        )
+    if groups:
+        for f in frappe.get_all(
+            "Item Feature",
+            filters={"disabled": 0, "feature_group": ["in", groups]},
+            fields=["name", "short_name", "icon", "feature_group"],
+            order_by="sort_order asc, short_name asc",
+        ):
+            by_group.setdefault(f.feature_group, []).append(
+                {"name": f.name, "short_name": f.short_name, "icon": f.icon or ""}
+            )
 
     for item in items:
-        flag = flagged.get(item.get("item_code"))
-        if flag:
-            item["features"] = by_group.get(flag.custom_item_feature_group, [])
-            item["require_item_feature"] = cint(flag.custom_require_item_feature)
+        meta = meta_rows.get(item.get("item_code"))
+        if not meta:
+            continue
+        if meta.custom_item_feature_group:
+            item["features"] = by_group.get(meta.custom_item_feature_group, [])
+            item["require_item_feature"] = cint(meta.custom_require_item_feature)
+        item["can_ship_frozen"] = cint(meta.custom_can_ship_frozen)
 
 
 @frappe.whitelist(allow_guest=True)

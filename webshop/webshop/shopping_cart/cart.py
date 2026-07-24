@@ -227,13 +227,31 @@ def _clean_item_feature(item_code, item_feature):
     return feature
 
 
+def _clean_ship_frozen(item_code, ship_frozen):
+    """Validate a requested frozen shipping flag (kenyerhaz custom) for an
+    item. Returns 0/1; throws when the item may not be shipped frozen."""
+    ship_frozen = cint(ship_frozen)
+    if not ship_frozen:
+        return 0
+    if not frappe.get_meta("Item").has_field("custom_can_ship_frozen"):
+        return 0
+    if not cint(frappe.db.get_value("Item", item_code, "custom_can_ship_frozen")):
+        throw(_("Item {0} cannot be shipped frozen.").format(item_code))
+    return 1
+
+
 @frappe.whitelist()
-def update_cart(item_code, qty, additional_notes=None, with_items=False, item_feature=None):
+def update_cart(item_code, qty, additional_notes=None, with_items=False, item_feature=None, ship_frozen=None):
     quotation = _get_cart_quotation()
     item_feature = _clean_item_feature(item_code, item_feature)
+    ship_frozen = _clean_ship_frozen(item_code, ship_frozen)
 
     def row_matches(d):
-        return d.item_code == item_code and (d.custom_item_feature or "") == item_feature
+        return (
+            d.item_code == item_code
+            and (d.custom_item_feature or "") == item_feature
+            and cint(d.custom_ship_frozen) == ship_frozen
+        )
 
     empty_card = False
     qty = flt(qty)
@@ -258,6 +276,7 @@ def update_cart(item_code, qty, additional_notes=None, with_items=False, item_fe
                     "item_code": item_code,
                     "qty": qty,
                     "custom_item_feature": item_feature or None,
+                    "custom_ship_frozen": ship_frozen,
                     "additional_notes": additional_notes,
                     "warehouse": warehouse,
                 },
@@ -318,6 +337,7 @@ def set_cart_item_feature(item_row_name, item_feature=None):
             if d.name != row.name
             and d.item_code == row.item_code
             and (d.custom_item_feature or "") == feature
+            and cint(d.custom_ship_frozen) == cint(row.custom_ship_frozen)
         ),
         None,
     )
@@ -327,6 +347,45 @@ def set_cart_item_feature(item_row_name, item_feature=None):
     else:
         row.custom_item_feature = feature or None
 
+    return _save_and_render_cart(quotation)
+
+
+@frappe.whitelist()
+def set_cart_item_frozen(item_row_name, ship_frozen=None):
+    """Toggle frozen shipping on one cart row.
+
+    If another row already holds the same item + feature with the target
+    frozen state, the quantities are merged into that row. Returns re-rendered
+    cart fragments (same shape as update_cart with_items=1).
+    """
+    quotation = _get_cart_quotation()
+
+    row = next((d for d in quotation.get("items") if d.name == item_row_name), None)
+    if not row:
+        throw(_("Cart item not found."))
+
+    frozen = _clean_ship_frozen(row.item_code, ship_frozen)
+
+    twin = next(
+        (
+            d for d in quotation.get("items")
+            if d.name != row.name
+            and d.item_code == row.item_code
+            and (d.custom_item_feature or "") == (row.custom_item_feature or "")
+            and cint(d.custom_ship_frozen) == frozen
+        ),
+        None,
+    )
+    if twin:
+        twin.qty = flt(twin.qty) + flt(row.qty)
+        quotation.set("items", [d for d in quotation.get("items") if d.name != row.name])
+    else:
+        row.custom_ship_frozen = frozen
+
+    return _save_and_render_cart(quotation)
+
+
+def _save_and_render_cart(quotation):
     apply_cart_settings(quotation=quotation)
     quotation.flags.ignore_permissions = True
     quotation.payment_schedule = []

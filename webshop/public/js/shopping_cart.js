@@ -91,6 +91,7 @@ $.extend(shopping_cart, {
 					item_code: opts.item_code,
 					qty: opts.qty,
 					item_feature: opts.item_feature !== undefined ? opts.item_feature : undefined,
+					ship_frozen: opts.ship_frozen !== undefined ? opts.ship_frozen : undefined,
 					additional_notes: opts.additional_notes !== undefined ? opts.additional_notes : undefined,
 					with_items: opts.with_items || 0
 				},
@@ -152,11 +153,12 @@ $.extend(shopping_cart, {
 		}
 	},
 
-	shopping_cart_update: function ({ item_code, qty, cart_dropdown, additional_notes, item_feature }) {
+	shopping_cart_update: function ({ item_code, qty, cart_dropdown, additional_notes, item_feature, ship_frozen }) {
 		shopping_cart.update_cart({
 			item_code,
 			qty,
 			item_feature,
+			ship_frozen,
 			additional_notes,
 			with_items: 1,
 			btn: this,
@@ -220,18 +222,17 @@ $.extend(shopping_cart, {
 				qty = parseFloat($qtyInput.val()) || 1;
 			}
 
-			// Custom: Read selected Item Feature (inside the container in list
-			// view, a sibling of it in grid view)
-			let $featureSelect = $container.find('.item-feature-select');
-			if (!$featureSelect.length) {
-				$featureSelect = $container.parent().find('.item-feature-select');
-			}
-			const item_feature = $featureSelect.val() || '';
+			// Custom: Read the order options block (a sibling of the
+			// quantity-add-container in both list and grid views)
+			const $options = $container.parent().find('.item-order-options');
+			const item_feature = $options.find('.item-feature-select').val() || '';
+			const ship_frozen = $options.find('.item-frozen-check').is(':checked') ? 1 : 0;
 
 			webshop.webshop.shopping_cart.update_cart({
 				item_code,
 				qty: qty,
-				item_feature
+				item_feature,
+				ship_frozen
 			});
 
 		});

@@ -81,6 +81,12 @@ webshop.ProductGrid = class {
 
 		body_html += this.get_weekly_availability(item);
 
+		// Order options (feature / frozen) come first, the price sits right
+		// below them, and the qty + add-to-cart row closes the card.
+		if (!item.has_variants && settings.enabled) {
+			body_html += webshop.get_item_options_html(item);
+		}
+
 		if (item.formatted_price) {
 			body_html += this.get_price_html(item);
 		}
@@ -195,17 +201,11 @@ webshop.ProductGrid = class {
 		} else if (settings.enabled && (settings.allow_items_not_in_stock || item.in_stock)) {
 			const btnClass = item.in_cart ? 'hidden' : '';
 			const inCartBtnClass = item.in_cart ? '' : 'hidden';
-			const featureSelect = webshop.get_item_feature_select(item, true);
 
 			return `
-				${featureSelect}
 				<div class="d-flex align-items-center mt-2 w-100 quantity-add-container">
-					<div class="input-group input-group-sm mr-2" style="width: 50px; flex: 0 0 50px;">
-						 <input type="number" class="form-control item-qty" value="1" min="1" step="1" 
-						 	style="padding: 0 0 0 5px; height: 28px; text-align: center;"
-						 	data-item-code="${item.item_code}">
-					</div>
-				
+					${webshop.get_qty_control_html(item.item_code)}
+
 					<div id="${item.name}" class="btn btn-sm btn-primary btn-add-to-cart-list flex-grow-1 ${btnClass}"
 						data-item-code="${item.item_code}"
 						style="padding: 0.25rem 0.5rem; display: flex; align-items: center; justify-content: center; min-width: 0;">

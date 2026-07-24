@@ -67,52 +67,62 @@ webshop.ProductList = class {
 	}
 
 	get_row_body_html(item, title, settings) {
-		let body_html = `<div class='col-10 text-left'>`;
-		body_html += this.get_title_html(item, title, settings);
+		// Two aligned columns: product info on the left, a single coherent
+		// "buy rail" (price → order options → qty + add-to-cart) on the right.
+		let body_html = `<div class='col-10 text-left'>
+			<div class="row" style="margin-left: -5px; margin-right: -5px;">`;
+
+		body_html += `<div class="col-12 col-md-7 pl-1 pr-1">`;
+		body_html += this.get_title_html(item, title);
 		body_html += this.get_item_details(item, settings);
 		body_html += `</div>`;
+
+		if (settings.enabled) {
+			body_html += `<div class="col-12 col-md-5 pl-1 pr-1 cart-action-container flex-column ${item.in_cart ? 'd-flex' : ''}">`;
+			if (!item.has_variants) {
+				body_html += webshop.get_item_options_html(item);
+			}
+			body_html += this.get_price_html(item, settings);
+			body_html += this.get_primary_button(item, settings);
+			body_html += `</div>`;
+		}
+
+		body_html += `</div></div>`;
 		return body_html;
 	}
 
-	get_title_html(item, title, settings) {
-		let title_html = `<div class="row" style="margin-left: -5px; margin-right: -5px;">`;
-		title_html += `
-			<div class="col-12 col-md-8 pl-1 pr-1">
-				<a class="" href="/${item.route || '#'}"
-					style="color: var(--gray-800); font-weight: 500;">
-					${title}
-				</a>
-			</div>
+	get_title_html(item, title) {
+		return `
+			<a class="" href="/${item.route || '#'}"
+				style="color: var(--gray-800); font-weight: 500;">
+				${title}
+			</a>
 		`;
-
-		if (settings.enabled) {
-			title_html += `<div class="col-12 col-md-4 pl-1 pr-1 cart-action-container ${item.in_cart ? 'd-flex' : ''}">`;
-			title_html += this.get_primary_button(item, settings);
-			title_html += `</div>`;
-		}
-		title_html += `</div>`;
-
-		return title_html;
 	}
 
 	get_item_details(item, settings) {
 		let details = `
-			<p class="product-code">
+			<p class="product-code mt-1 mb-1">
 				${item.item_group}
 			</p>
-			<div class="mt-2" style="color: var(--gray-600) !important; font-size: 13px;">
+			<div class="mt-1" style="color: var(--gray-600) !important; font-size: 13px;">
 				${item.short_description || ''}
 			</div>`;
 
 		details += this.get_weekly_availability(item);
+		return details;
+	}
 
-		details += `
-			<div class="product-price col-3 d-flex" itemprop="offers"  itemscope itemtype="https://schema.org/AggregateOffer" style="float: right;">
-			${item.formatted_price || ''}
+	get_price_html(item, settings) {
+		let price_html = `
+			<div class="product-price d-flex justify-content-md-end align-items-baseline mb-1"
+				itemprop="offers" itemscope itemtype="https://schema.org/AggregateOffer"
+				style="margin: 0;">
+				${item.formatted_price || ''}
 			`;
 
 		if (item.formatted_mrp) {
-			details += `
+			price_html += `
 				<small class="striked-price">
 					<s>${item.formatted_mrp ? item.formatted_mrp.replace(/ +/g, "") : ""}</s>
 				</small>
@@ -122,10 +132,9 @@ webshop.ProductList = class {
 			`;
 		}
 
-		details += this.get_stock_availability(item, settings);
-		details += `</div>`;
-
-		return details;
+		price_html += this.get_stock_availability(item, settings);
+		price_html += `</div>`;
+		return price_html;
 	}
 
 	get_weekly_availability(item) {
@@ -198,16 +207,10 @@ webshop.ProductList = class {
 		} else if (settings.enabled && (settings.allow_items_not_in_stock || item.in_stock)) {
 			const btnClass = item.in_cart ? 'hidden' : '';
 			const inCartBtnClass = item.in_cart ? '' : 'hidden';
-			const featureSelect = webshop.get_item_feature_select(item);
 
 			return `
-				<div class="d-flex justify-content-end align-items-center quantity-add-container mt-2 mt-md-0">
-					${featureSelect}
-					<div class="input-group input-group-sm mr-2" style="width: 60px;">
-						 <input type="number" class="form-control item-qty" value="1" min="1" step="1"
-						 	style="height: 30px; text-align: center;"
-						 	data-item-code="${item.item_code}">
-					</div>
+				<div class="d-flex justify-content-end align-items-center quantity-add-container mt-2">
+					${webshop.get_qty_control_html(item.item_code)}
 
 					<div id="${item.name}" class="btn
 						btn-sm btn-primary btn-add-to-cart-list mb-0
